@@ -1,17 +1,17 @@
-import PySimpleGUI as sg 
+import PySimpleGUI as sg
 import pickle as p
 
 sg.ChangeLookAndFeel('DarkBlue')
 
-sg.SetOptions(text_justification='left')    
-layout = [ 
-	[sg.Text('Experiment', size=(20,1)), sg.Radio('Excitation', 'RADIO1', default=True, enable_events=True, key='radio_ex'), 
+sg.SetOptions(text_justification='left')
+layout = [
+	[sg.Text('Experiment', size=(20,1)), sg.Radio('Excitation', 'RADIO1', default=True, enable_events=True, key='radio_ex'),
 		sg.Radio('Emission', 'RADIO1',  enable_events=True, key='radio_em'), sg.Radio('Kinectics', 'RADIO1', enable_events=True, key='radio_ki')],
-	[sg.Text('Excitation', size=(20,1)), sg.Input(size=(4,1), key='input_ex_st'), sg.Text('nm', justification='left'), 
+	[sg.Text('Excitation', size=(20,1)), sg.Input(size=(4,1), key='input_ex_st'), sg.Text('nm', justification='left'),
 		sg.Input(size=(4,1), key='input_ex_en'), sg.Text('nm', justification='left')],
-	[sg.Text('Emission', size=(20,1)), sg.Input(size=(4,1), key='input_em_st'), sg.Text('nm', justification='left'), 
+	[sg.Text('Emission', size=(20,1)), sg.Input(size=(4,1), key='input_em_st'), sg.Text('nm', justification='left'),
 		sg.Input(size=(4,1), disabled=True, key='input_em_en'), sg.Text('nm', justification='left')],
-	[sg.Text('Increment', size=(20,1)), sg.Input(size=(4,1), key='input_in_nm'), sg.Text('nm', justification='left'), sg.Input(size=(4,1), key='input_in_s'), sg.Text('s', justification='left')],
+	[sg.Text('Increment', size=(20,1)), sg.Input(size=(4,1), key='input_in_nm'), sg.Text('nm', justification='left'), sg.Input(size=(4,1), disabled=True, key='input_in_s'), sg.Text('s', justification='left')],
 	[sg.Text('Integration time', size=(20,1)), sg.Input(size=(4,1)), sg.Text('s', justification='left')],
 	[sg.Text('Total reaction time', size=(20,1)), sg.Input(size=(4,1), disabled=True, key='input_ti'), sg.Text('s', justification='left')]
 ]
