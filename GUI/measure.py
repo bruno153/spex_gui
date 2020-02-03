@@ -17,7 +17,7 @@ window.close()
 increment = float(values[0])
 
 layout_measure = [
-	[sg.Text('0', key='text')],
+	[sg.Text('0000', key='text')],
 	[sg.Button('Pause'), sg.Button('Resume'), sg.Button('Quit')]
 ]
 
@@ -25,25 +25,27 @@ window = sg.Window('Working...', layout_measure)
 
 paused = False
 start_time = time.time()
-measured = 10
+measured = 0
 
 while True:
+
 	if not paused:
 		event, values = window.read(timeout=10)
 		current_time = time.time() # if not paused, update time
 	else:
-		print('paused')
+		print('paused2')
 		event, values = window.read() # if paused, wait for user input
 		current_time = time.time() 
 		start_time = start_time + (time.time() - paused_time)
 		paused = False
 
-
 	if event == 'Quit' or None:
 		break
 	if event == 'Pause':
+		print('paused')
 		paused_time = time.time()
-		paused == True
+		paused = True
+		print(paused)
 
 	if current_time - start_time > increment:
 		start_time = time.time()
