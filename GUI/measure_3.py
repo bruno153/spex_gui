@@ -8,8 +8,8 @@ import random as rnd
 sg.ChangeLookAndFeel('DarkBlue')
 
 #varables from setup
-nm_start = 400
-nm_stop = 600
+nm_start = 300
+nm_stop = 700
 nm_step = 1
 time_step = 0.1
 samples_per_second = 16
@@ -26,7 +26,7 @@ measure_time = 1/samples_per_second
 layout_measure = [
 	[sg.Text('Measuring: '), sg.Text(str(nm_pos), size=(3, 1), key='text.nm')],
 	[sg.Text('Sample number: '), sg.Text(str(len(sample_list)), size=(2, 1), key='text.sample')],
-	[sg.Graph(canvas_size=(400, 100), graph_bottom_left=(nm_start-5,-20), graph_top_right=(nm_stop+5,120), background_color='white', key='graph', tooltip='This is a cool graph!')],
+	[sg.Graph(canvas_size=(1200, 300), graph_bottom_left=(nm_start-5,-20), graph_top_right=(nm_stop+5,120), background_color='white', key='graph', tooltip='This is a cool graph!')],
 	[sg.Button('Pause'), sg.Button('Resume'), sg.Button('Quit')] 
 ]
 

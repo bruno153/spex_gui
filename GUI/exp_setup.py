@@ -12,7 +12,7 @@ layout = [
 	[sg.Text('Emission', size=(20,1)), sg.Input(size=(4,1), key='input_em_st'), sg.Text('nm', justification='left'),
 		sg.Input(size=(4,1), disabled=True, key='input_em_en'), sg.Text('nm', justification='left')],
 	[sg.Text('Increment', size=(20,1)), sg.Input(size=(4,1), key='input_in_nm'), sg.Text('nm', justification='left'), sg.Input(size=(4,1), disabled=True, key='input_in_s'), sg.Text('s', justification='left')],
-	[sg.Text('Integration time', size=(20,1)), sg.Input(size=(4,1)), sg.Text('s', justification='left')],
+	[sg.Text('Integration time', size=(20,1)), sg.Slider(range=(1, 10), orientation='h', size=(20, 20), default_value=1, key='slider', enable_events=True, disable_number_display=True), sg.Text('0.1 s', justification='left', key='text.slider')],
 	[sg.Text('Total reaction time', size=(20,1)), sg.Input(size=(4,1), disabled=True, key='input_ti'), sg.Text('s', justification='left')]
 ]
 
@@ -41,6 +41,9 @@ while True:
 		window.Element('input_ti').Update(disabled=False)
 		window.Element('input_in_s').Update(disabled=False)
 		window.Element('input_in_nm').Update(disabled=True)
+
+	if event=='slider':
+		window.Element('text.slider').Update(str(values['slider']/10)+' s')
 
 	if event==None:
 		break
