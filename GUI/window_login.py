@@ -36,7 +36,10 @@ def login():
 			window2 = sg.Window('NewUser', layout_newuser)
 			event2, values2 = window2.read()
 			window2.close()
-			if len(values2[0]) == 0 or values2[0] in userlist:
+			if event2 == 'Cancel':
+				pass
+
+			elif len(values2[0]) == 0 or values2[0] in userlist:
 				if len(values2[0]) == 0:
 					sg.PopupOK('Coloca nome direito caralho.')
 				if values2[0] in userlist:
