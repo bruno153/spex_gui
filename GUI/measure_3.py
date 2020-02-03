@@ -26,10 +26,21 @@ measure_time = 1/samples_per_second
 layout_measure = [
 	[sg.Text('Measuring: '), sg.Text(str(nm_pos), size=(3, 1), key='text.nm')],
 	[sg.Text('Sample number: '), sg.Text(str(len(sample_list)), size=(2, 1), key='text.sample')],
+	[sg.Graph(canvas_size=(400, 100), graph_bottom_left=(nm_start-5,-20), graph_top_right=(nm_stop+5,120), background_color='white', key='graph', tooltip='This is a cool graph!')],
 	[sg.Button('Pause'), sg.Button('Resume'), sg.Button('Quit')] 
 ]
 
 window = sg.Window('Working...', layout_measure)
+window.finalize()
+graph = window['graph']
+
+#draw axis
+graph.DrawLine((nm_start, 0), (nm_stop, 0))
+
+for x in range(nm_start, nm_stop+1, 20):    
+    graph.DrawLine((x,-3), (x,3))    
+    if x != 0:    
+        graph.DrawText( x, (x,-10), color='green')
 
 
 while True:
@@ -44,6 +55,7 @@ while True:
 	sample_list.append(rnd.random())
 	if len(sample_list) == samples_per_measurement: #took all measurements in the set 
 		print((nm_pos, sum(sample_list)))
+		graph.DrawCircle((nm_pos, sum(sample_list)*100), 1)
 		measurement.append((nm_pos, sum(sample_list)))
 		sample_list = []
 		nm_pos += nm_step
@@ -53,4 +65,6 @@ while True:
 	window.Element('text.nm').update(str(nm_pos))
 	window.Element('text.sample').update(str(len(sample_list)))
 
+
+window.read()
 window.close()
