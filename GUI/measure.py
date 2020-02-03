@@ -30,7 +30,7 @@ measured = 0
 while True:
 
 	if not paused:
-		event, values = window.read(timeout=10)
+		event, values = window.read(timeout=20)
 		current_time = time.time() # if not paused, update time
 	else:
 		print('paused2')
@@ -48,6 +48,7 @@ while True:
 		print(paused)
 
 	if current_time - start_time > increment:
+		print((current_time-start_time)-increment)
 		start_time = time.time()
 		measured = measured + 1
 		window['text'].update(str(measured))
