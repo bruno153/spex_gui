@@ -1,4 +1,5 @@
 import PySimpleGUI as sg
+from window_manual_control import manual_control
 
 sg.ChangeLookAndFeel('DarkBlue')
 
@@ -15,7 +16,8 @@ def exp_setup():
 		[sg.Text('Increment', size=(20,1)), sg.Input(size=(4,1), key='input_in_nm'), sg.Text('nm', justification='left'), sg.Input(size=(4,1), disabled=True, key='input_in_s'), sg.Text('s', justification='left')],
 		[sg.Text('Integration time', size=(20,1)), sg.Slider(range=(1, 10), orientation='h', size=(20, 20), default_value=1, key='integration_time', enable_events=True, disable_number_display=True), sg.Text('0.1 s', justification='left', key='text.slider')],
 		[sg.Text('Total reaction time', size=(20,1)), sg.Input(size=(4,1), disabled=True, key='input_ti'), sg.Text('s', justification='left')],
-		[sg.Button('Submit')]
+		[sg.Text('Measure: ', size=(20,1)), sg.Text('0.0', size=(4,1), key='measure')],
+		[sg.Button('Submit'), sg.Button('Open Manual Control', key='manual_control'), sg.Quit()]
 	]
 
 	window = sg.Window('SPEX control', layout)
@@ -46,7 +48,10 @@ def exp_setup():
 
 		if event=='integration_time':
 			window.Element('text.slider').Update(str(values['integration_time']/10)+' s')
-
+		
+		if event=='manual_control':
+			manual_control()
+		
 		if event==None or event=='Submit':
 			break
 
