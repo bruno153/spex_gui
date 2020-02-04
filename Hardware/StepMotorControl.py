@@ -43,13 +43,13 @@ while True:
     Serial.println(" steps.")
 
     while targetstep != 0:
-        if targetstep > 0 and stopPin2.value() == 1: # gpio 23
+        if targetstep > 0 and stopPin2.value == 1: # gpio 23
             dirPin.off()
             stepPin.on()
             sleep(stepInterval)
             targetstep = targetstep - 1
 
-        if targetstep < 0 and stopPin1.value() == 1: # pino 22
+        if targetstep < 0 and stopPin1.value == 1: # pino 22
             dirPin.on()
             stepPin.on()
             sleep(stepInterval)
