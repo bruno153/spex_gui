@@ -2,6 +2,29 @@
 
 import PySimpleGUI as sg
 import pickle as p
+from StepControler import manual_step
+
+import gpiozero as io
+
+from gpiozero.pins.mock import MockFactory
+io.Device.pin_factory = MockFactory()
+
+pin_list = {}
+
+pin_list['stepPin'] = io.DigitalOutputDevice(17)
+pin_list['dirPin'] = io.DigitalOutputDevice(27)
+pin_list['stepInterval'] = .005 # milliseconds
+pin_list['stopPin1'] = io.DigitalInputDevice(22) # positivo
+pin_list['stopPin2'] = io.DigitalInputDevice(23) # negativo
+
+stopref1 = io.Device.pin_factory.pin(22)
+stopref2 = io.Device.pin_factory.pin(23)
+
+stopref1.drive_high()
+stopref2.drive_high()
+
+pin_list['stepPin'].off()
+
 from math import sin
 
 sg.ChangeLookAndFeel('DarkBlue')
@@ -19,6 +42,7 @@ layout_manualControl = [
    [sg.Text('Current emition: ', size=(15, 1)), sg.Text(str(emVal), size=(4, 1), key='emVal')],
    [sg.Text('Measure: ', size=(15, 1)), sg.Text('0', size=(4,1), justification='right', key='measure')],
    [sg.Graph(canvas_size=(270, 270), graph_bottom_left=(0,0), graph_top_right=(200, 200), background_color='white', key='graph')],
+#   [sg.Output()],
    [sg.Quit()]
 
 ]
@@ -37,6 +61,7 @@ while True:
      elif manCtrl_event in ('-100', '-10', '-1', '-0.1', '+100', '+10', '+1', '+0.1'):
           val = float(manCtrl_event)
           if values['ex']:
+               manual_step(val, pin_list)
                exVal = exVal + val
                window_manualControl['exVal'].Update('{0:.1f}'.format(exVal))
           else:
