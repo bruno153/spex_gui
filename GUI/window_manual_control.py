@@ -53,11 +53,11 @@ def manual_control(pin_list_ex, pin_list_em):
 		if manCtrl_event in ('-100', '-10', '-1', '-0.1', '+100', '+10', '+1', '+0.1'):
 			val = int(float(manCtrl_event)*10)
 			if values['ex']:
-				wave_step(val, pin_list_ex)
+				wave_step(val/10, pin_list_ex)
 				ex_val = ex_val + val
 				window_manualControl['ex_val'].Update(ex_val/10)
 			else:
-				wave_step(val, pin_list_em)
+				wave_step(val/10, pin_list_em)
 				em_val = em_val + val
 				window_manualControl['em_val'].Update(em_val/10)
 
@@ -70,7 +70,7 @@ def manual_control(pin_list_ex, pin_list_em):
 		window_manualControl['measure'].Update('{0:.1f}'.format(100*sin(3.1415629*1310*x) + 100))
 		x = x + 1
 		i = i + 1
-	dic = {'ex_nm_val': ex_val/10, 'em_nm_val': em_val/10}
+	dic = {'nm_pos_ex': ex_val/10, 'nm_pos_em': em_val/10}
 	window_manualControl.close()
 	return dic
 	

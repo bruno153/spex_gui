@@ -37,7 +37,6 @@ def manual_step(targetstep, pin_list):
 		if targetstep > 0 and stopPin2.value == 1: # pin 23
 			dirPin.off()
 			stepPin.on()
-			print(stepPin.value)
 			sleep(stepInterval)
 			targetstep = targetstep - 1
 		if targetstep < 0 and stopPin1.value == 1: # pin 22

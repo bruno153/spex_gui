@@ -1,3 +1,4 @@
+import sys
 sys.path.append('../')
 import PySimpleGUI as sg 
 import time
@@ -33,10 +34,10 @@ def measure(values, pin_list):
 	measurement = []
 
 	#dummy values
-	measure_time = 1/samples_per_seconds
+	measure_time = 1/samples_per_second
 
 	#set to initial position
-	wave_step(nm_start-nm_pos)
+	wave_step(nm_start-nm_pos, pin_list)
 	nm_pos = nm_start
 
 	#setup GUI
@@ -84,7 +85,7 @@ def measure(values, pin_list):
 			nm_pos += nm_step
 
 			#move stepper
-			wave_step(nm_step)
+			wave_step(nm_step, pin_list)
 		if nm_pos > nm_stop: #the experiment has ended
 			break
 		#update window
