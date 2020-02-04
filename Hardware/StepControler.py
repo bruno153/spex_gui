@@ -50,7 +50,7 @@ def manual_step(targetstep, pin_list):
 
 def waveToSteps(wave):
     wave2 = wave	
-    rate = 5 # steps/nm
+    rate = 50 # steps/nm
     return int(rate*wave2)
 	
 def wave_step(targetwave, pin_list):
