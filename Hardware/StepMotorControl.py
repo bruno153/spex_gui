@@ -29,7 +29,7 @@ def waveToSteps(wave):
     return int(rate*wave2)
 
 
-while True():
+while True:
     Serial.println("Insert next wavelength:\n") # DEVE SER INTEGRADO NO FRONT----
     targetwave = Serial.parseInt()
     Serial.print("Setting wavelength set at ")
