@@ -3,10 +3,11 @@
 import PySimpleGUI as sg
 import pickle as p
 from StepControler import manual_step
-
+from math import sin
 import gpiozero as io
-
 from gpiozero.pins.mock import MockFactory
+
+#pin setup
 io.Device.pin_factory = MockFactory()
 
 pin_list = {}
@@ -25,8 +26,8 @@ stopref2.drive_high()
 
 pin_list['stepPin'].off()
 
-from math import sin
 
+# GUI setup
 sg.ChangeLookAndFeel('DarkBlue')
 
 exVal = 400.0

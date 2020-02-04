@@ -34,13 +34,13 @@ def manual_step(targetstep, pin_list):
 	stopPin1 = pin_list['stopPin1']
 	stopPin2 = pin_list['stopPin2']
 	while targetstep != 0:	
-		if targetstep > 0 and stopPin2.value == 1: # gpio 23
+		if targetstep > 0 and stopPin2.value == 1: # pin 23
 			dirPin.off()
 			stepPin.on()
 			print(stepPin.value)
 			sleep(stepInterval)
 			targetstep = targetstep - 1
-		if targetstep < 0 and stopPin1.value == 1: # pino 22
+		if targetstep < 0 and stopPin1.value == 1: # pin 22
 			dirPin.on()
 			stepPin.on()
 			sleep(stepInterval)
