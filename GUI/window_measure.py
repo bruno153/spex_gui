@@ -1,7 +1,8 @@
+sys.path.append('../')
 import PySimpleGUI as sg 
 import time
 from math import floor
-
+from Hardware.StepControler import wave_step
 #for test purposes ONLY
 import random as rnd
 
@@ -27,7 +28,7 @@ def measure(values, pin_list):
 	samples_per_measurement = floor(samples_per_second*time_step)
 
 	#process calculation
-	nm_pos = values['nm_pos']
+	nm_pos = values['nm_pos_ex']
 	sample_list = []
 	measurement = []
 
@@ -35,7 +36,7 @@ def measure(values, pin_list):
 	measure_time = 1/samples_per_seconds
 
 	#set to initial position
-	manual_step(waveToSteps(nm_start-nm_pos))
+	wave_step(nm_start-nm_pos)
 	nm_pos = nm_start
 
 	#setup GUI
@@ -81,9 +82,9 @@ def measure(values, pin_list):
 			
 			sample_list = []
 			nm_pos += nm_step
-			
+
 			#move stepper
-			manual_step(waveToSteps(nm_step))
+			wave_step(nm_step)
 		if nm_pos > nm_stop: #the experiment has ended
 			break
 		#update window
