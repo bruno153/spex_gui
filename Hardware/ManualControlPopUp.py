@@ -8,24 +8,26 @@ import gpiozero as io
 from gpiozero.pins.mock import MockFactory
 
 #pin setup
-io.Device.pin_factory = MockFactory()
+#io.Device.pin_factory = MockFactory()
 
 pin_list = {}
 
-pin_list['stepPin'] = io.DigitalOutputDevice(17)
-pin_list['dirPin'] = io.DigitalOutputDevice(27)
+pin_list['stepPin'] = io.DigitalOutputDevice(19)
+pin_list['dirPin'] = io.DigitalOutputDevice(26)
 pin_list['stepInterval'] = .005 # milliseconds
-pin_list['stopPin1'] = io.DigitalInputDevice(22) # positivo
-pin_list['stopPin2'] = io.DigitalInputDevice(23) # negativo
+pin_list['stopPin1'] = io.DigitalInputDevice(20) # positivo
+pin_list['stopPin2'] = io.DigitalInputDevice(21) # negativo
+pin_list['vcc'] = io.DigitalOutputDevice(16)
 
+'''
 stopref1 = io.Device.pin_factory.pin(22)
 stopref2 = io.Device.pin_factory.pin(23)
 
 stopref1.drive_high()
 stopref2.drive_high()
-
+'''
 pin_list['stepPin'].off()
-
+pin_list['vcc'].on()
 
 # GUI setup
 sg.ChangeLookAndFeel('DarkBlue')

@@ -7,23 +7,24 @@ from window_measure import measure
 from window_login import login
 from window_manual_control import manual_control
 
-from gpiozero.pins.mock import MockFactory
-io.Device.pin_factory = MockFactory()
+#from gpiozero.pins.mock import MockFactory
+#io.Device.pin_factory = MockFactory()
 
 # Pin setup
 pin_list = {}
 
-pin_list['stepPin'] = io.DigitalOutputDevice(17)
-pin_list['dirPin'] = io.DigitalOutputDevice(27)
+pin_list['stepPin'] = io.DigitalOutputDevice(19)
+pin_list['dirPin'] = io.DigitalOutputDevice(26)
 pin_list['stepInterval'] = .005 # milliseconds
-pin_list['stopPin1'] = io.DigitalInputDevice(22) # positivo
-pin_list['stopPin2'] = io.DigitalInputDevice(23) # negativo
+pin_list['stopPin1'] = io.DigitalInputDevice(20) # positivo
+pin_list['stopPin2'] = io.DigitalInputDevice(21) # negativo
+vcc = io.DigitalOutputDevice(16)
+vcc.on()
+#stopref1 = io.Device.pin_factory.pin(22)
+#stopref2 = io.Device.pin_factory.pin(23)
 
-stopref1 = io.Device.pin_factory.pin(22)
-stopref2 = io.Device.pin_factory.pin(23)
-
-stopref1.drive_high()
-stopref2.drive_high()
+#stopref1.drive_high()
+#stopref2.drive_high()
 
 pin_list['stepPin'].off()
 
