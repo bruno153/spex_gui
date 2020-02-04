@@ -61,8 +61,13 @@ def measure(values):
 		sample_list.append(rnd.random())
 		if len(sample_list) == samples_per_measurement: #took all measurements in the set 
 			print((nm_pos, sum(sample_list)))
-			graph.DrawPoint((nm_pos, (sum(sample_list)/len(sample_list)*100)), 0.1)
-			measurement.append((nm_pos, sum(sample_list)))
+			measurement.append((nm_pos, sum(sample_list)/len(sample_list)*100))
+
+			#draw a line between the last two measurements
+			#if there's at least two elements in the measurement
+			if len(measurement) > 1:
+				graph.DrawLine(measurement[-1], measurement[-2])
+			
 			sample_list = []
 			nm_pos += nm_step
 		if nm_pos > nm_stop: #the experiment has ended

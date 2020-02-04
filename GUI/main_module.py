@@ -7,6 +7,9 @@ from window_login import login
 
 
 user = login()
+if user == None:
+	exit()
+
 print(user)
 values = exp_setup()
 measure(values)

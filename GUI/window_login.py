@@ -17,7 +17,7 @@ def login():
 	while True:
 		layout_login = [
 			[sg.Text('User'), sg.InputCombo(userlist, key='input_user')],
-			[sg.Button('Login'), sg.Button('Delete User'),sg.Button('New User')]
+			[sg.Button('Delete User'),sg.Button('New User'), sg.Button('Login')]
 		]
 
 
@@ -58,10 +58,13 @@ def login():
 				popup = sg.PopupOK('Select user to delete on last screen first.')
 
 		if event==None:
-			break
+			return None
 
 		if event=='Login':
-			p.dump(userlist, open('users.p', 'wb'))
-			window.close()
-			return values['input_user']
+			if len(values['input_user']) == 0:
+				sg.PopupOK('Please select a user.')
+			else:
+				p.dump(userlist, open('users.p', 'wb'))
+				window.close()
+				return values['input_user']
 
