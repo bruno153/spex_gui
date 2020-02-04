@@ -7,8 +7,11 @@ from window_measure import measure
 from window_login import login
 from window_manual_control import manual_control
 
+# from gpiozero.pins.mock import MockFactory
+# io.Device.pin_factory = MockFactory()
+
 # Pin setup
-in_list = {}
+pin_list = {}
 
 pin_list['stepPin'] = io.DigitalOutputDevice(17)
 pin_list['dirPin'] = io.DigitalOutputDevice(27)

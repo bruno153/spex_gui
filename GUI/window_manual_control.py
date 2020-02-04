@@ -25,7 +25,7 @@ def manual_control(pin_list_ex, pin_list_em):
 		sg.Button('Set value', size=(7,1), key='set_em_btn'), sg.Input(size=(5,1), key='set_em_val')],
 		[sg.Text('Measure: ', size=(15, 1)), sg.Text('0', size=(4,1), justification='right', key='measure')],
 		[sg.Graph(canvas_size=(270, 270), graph_bottom_left=(0,0), graph_top_right=(200, 200), background_color='white', key='graph')],
-		[sg.Quit()]
+		[sg.Quit(), sg.Submit()]
 
 	]
 	x=0
@@ -37,16 +37,18 @@ def manual_control(pin_list_ex, pin_list_em):
 
 	while True:
 		manCtrl_event, values = window_manualControl.read(timeout=10)
-		if manCtrl_event in (None, 'Quit'):
+		if manCtrl_event in (None, 'Quit', 'Submit'):
 			break
 
 		if manCtrl_event=='set_ex_btn':
 			ex_val = int(float(values['set_ex_val'])*10)
 			window_manualControl['ex_val'].Update(ex_val/10)
+			window_manualControl['set_ex_val'].Update('')
 			
 		if manCtrl_event=='set_em_btn':
 			em_val = int(float(values['set_em_val'])*10)
 			window_manualControl['em_val'].Update(em_val/10)
+			window_manualControl['set_em_val'].Update('')
 
 		if manCtrl_event in ('-100', '-10', '-1', '-0.1', '+100', '+10', '+1', '+0.1'):
 			val = int(float(manCtrl_event)*10)
@@ -68,8 +70,7 @@ def manual_control(pin_list_ex, pin_list_em):
 		window_manualControl['measure'].Update('{0:.1f}'.format(100*sin(3.1415629*1310*x) + 100))
 		x = x + 1
 		i = i + 1
-
+	dic = {'ex_nm_val': ex_val/10, 'em_nm_val': em_val/10}
 	window_manualControl.close()
+	return dic
 	
-# PARA RODAR A JANELA, BASTA DESCOMENTAR E RODAR window_manual_Control.py
-#manual_control({},{})
