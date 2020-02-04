@@ -7,8 +7,13 @@ import random as rnd
 
 sg.ChangeLookAndFeel('DarkBlue')
 
+def waveToSteps(wave):
+    wave2 = wave	
+    rate = 5 # steps/nm
+    return int(rate*wave2)
 
-def measure(values):
+
+def measure(values, pin_list):
 	#varables from setup
 	if values['radio_ex'] == 1:
 		nm_start = values['input_ex_st']
@@ -22,12 +27,18 @@ def measure(values):
 	samples_per_measurement = floor(samples_per_second*time_step)
 
 	#process calculation
-	nm_pos = nm_start
+	nm_pos = values['nm_pos']
 	sample_list = []
 	measurement = []
 
 	#dummy values
-	measure_time = 1/samples_per_second
+	measure_time = 1/samples_per_seconds
+
+	#set to initial position
+	manual_step(waveToSteps(nm_start-nm_pos))
+	nm_pos = nm_start
+
+	#setup GUI
 
 	layout_measure = [
 		[sg.Text('Measuring: '), sg.Text(str(nm_pos), size=(3, 1), key='text.nm')],
@@ -70,6 +81,9 @@ def measure(values):
 			
 			sample_list = []
 			nm_pos += nm_step
+			
+			#move stepper
+			manual_step(waveToSteps(nm_step))
 		if nm_pos > nm_stop: #the experiment has ended
 			break
 		#update window
