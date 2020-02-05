@@ -7,8 +7,8 @@ from window_measure import measure
 from window_login import login
 from window_manual_control import manual_control
 
-#from gpiozero.pins.mock import MockFactory
-#io.Device.pin_factory = MockFactory()
+from gpiozero.pins.mock import MockFactory
+io.Device.pin_factory = MockFactory()
 
 # Pin setup
 pin_list = {}

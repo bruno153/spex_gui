@@ -41,14 +41,19 @@ def manual_control(pin_list_ex, pin_list_em):
 			break
 
 		if manCtrl_event=='set_ex_btn':
-			ex_val = int(float(values['set_ex_val'])*10)
-			window_manualControl['ex_val'].Update(ex_val/10)
-			window_manualControl['set_ex_val'].Update('')
-			
+			try:
+				ex_val = int(float(values['set_ex_val'])*10)
+				window_manualControl['ex_val'].Update(ex_val/10)
+				window_manualControl['set_ex_val'].Update('')
+			except:
+				sg.PopupOK('Escreva um número (use ponto para o decimal)', title='Erro')
 		if manCtrl_event=='set_em_btn':
-			em_val = int(float(values['set_em_val'])*10)
-			window_manualControl['em_val'].Update(em_val/10)
-			window_manualControl['set_em_val'].Update('')
+			try:	
+				em_val = int(float(values['set_em_val'])*10)
+				window_manualControl['em_val'].Update(em_val/10)
+				window_manualControl['set_em_val'].Update('')
+			except:
+				sg.PopupOK('Escreva um número (use ponto para o decimal)', title='Erro')
 
 		if manCtrl_event in ('-100', '-10', '-1', '-0.1', '+100', '+10', '+1', '+0.1'):
 			val = int(float(manCtrl_event)*10)
