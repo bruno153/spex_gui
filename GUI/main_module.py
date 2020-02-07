@@ -1,6 +1,7 @@
 import PySimpleGUI as sg
 import pickle as p
 import gpiozero as io
+from time import sleep
 
 from window_exp_setup import exp_setup
 from window_measure import measure
@@ -28,6 +29,11 @@ vcc.on()
 
 pin_list['stepPin'].off()
 
+
+#sg.PopupAnimated('nyan.gif', time_between_frames=40)
+for i in range(100):
+    sg.popup_animated('splash_screen.gif', time_between_frames=50)
+    sleep(1)
 
 
 user = login()
