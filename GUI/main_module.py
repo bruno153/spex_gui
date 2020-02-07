@@ -7,6 +7,7 @@ from window_exp_setup import exp_setup
 from window_measure import measure
 from window_login import login
 from window_manual_control import manual_control
+from window_splash import splash
 
 from gpiozero.pins.mock import MockFactory
 io.Device.pin_factory = MockFactory()
@@ -29,12 +30,7 @@ vcc.on()
 
 pin_list['stepPin'].off()
 
-
-#sg.PopupAnimated('nyan.gif', time_between_frames=40)
-for i in range(100):
-    sg.popup_animated('splash_screen.gif', time_between_frames=50)
-    sleep(1)
-
+splash()
 
 user = login()
 if user == None:
