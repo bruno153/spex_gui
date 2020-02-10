@@ -16,7 +16,7 @@ layout_areyousure = [
 def login():
 	while True:
 		layout_login = [
-			[sg.Text('User'), sg.InputCombo(userlist, key='input_user')],
+			[sg.Text('User'), sg.Listbox(userlist, size=(10, 2), key='input_user')], #MUDEI DE COMBO PARA LISTBOX DEVIDO A POSSÍVEL INPUT INDEVIDO DO USUÁRIO
 			[sg.Button('Delete User'),sg.Button('New User'), sg.Button('Login')]
 		]
 

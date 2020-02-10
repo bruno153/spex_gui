@@ -5,7 +5,7 @@ Created on Thu Jan 30 09:24:28 2020
 Controlador dos motores de passo, versão python
 para raspy
 
-@author: rafael
+@author: Bruno Yamada, Rafael Zuolo
 """
 
 import gpiozero as io
@@ -34,12 +34,12 @@ def manual_step(targetstep, pin_list):
 	stopPin1 = pin_list['stopPin1']
 	stopPin2 = pin_list['stopPin2']
 	while targetstep != 0:	
-		if targetstep > 0 and stopPin2.value == 1: # pin 23
+		if targetstep > 0 and stopPin2.value == 0: # gpio 23
 			dirPin.off()
 			stepPin.on()
 			sleep(stepInterval)
 			targetstep = targetstep - 1
-		if targetstep < 0 and stopPin1.value == 1: # pin 22
+		if targetstep < 0 and stopPin1.value == 0: # gpio 22
 			dirPin.on()
 			stepPin.on()
 			sleep(stepInterval)
