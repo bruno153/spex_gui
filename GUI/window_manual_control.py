@@ -17,7 +17,7 @@ def manual_control(pin_list_ex, pin_list_em):
     layout_manualControl = [
         [sg.Text('Manual Control', font=('Helvetica', 16))],
         [sg.Radio('Excitation', 'control', default=True, key='ex'), sg.Radio('Emission', 'control', key='em')],
-        [sg.Button('-100 nm', size=(8, 1), key='-100'), sg.Button('-10 nm', size=(7, 1), key='-10'),
+        [sg.Button('', size=(8, 1), key='-100', image_filename='assets/buttons/-100.png', size_px=(10,10)), sg.Button('-10 nm', size=(7, 1), key='-10'),
             sg.Button('-1 nm', size=(7, 1), key='-1'), sg.Button('-0.1 nm', size=(7, 1), key='-0.1')],
         [sg.Button('+100 nm', size=(8, 1), key='+100'), sg.Button('+10 nm', size=(7, 1), key='+10'), 
             sg.Button('+1 nm', size=(7, 1), key='+1'), sg.Button('+0.1 nm', size=(7, 1), key='+0.1')],
