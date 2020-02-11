@@ -63,7 +63,7 @@ def stepGenerator(targetstep):
     for i in range (0, 2*targetstep + 1):
         yield blink
         blink = not blink
-        print(blink)
+        #print(blink)
     
 def waveToSteps(wave):
     wave2 = wave    
