@@ -66,7 +66,7 @@ def measure(values, pin_list):
 	layout_measure = [
 		[sg.Text('Measuring: '), sg.Text(str(nm_pos), size=(3, 1), key='text.nm')],
 		[sg.Text('Sample number: '), sg.Text(str(len(sample_list)), size=(2, 1), key='text.sample')],
-		[sg.Graph(canvas_size=(1200, 300), graph_bottom_left=(nm_start-5,-20), graph_top_right=(nm_stop+5,110000), background_color='white', key='graph')],
+		[sg.Graph(canvas_size=(1200, 300), graph_bottom_left=(nm_start-5,-20), graph_top_right=(nm_stop+5,32000), background_color='white', key='graph')],
 		[sg.Button('Pause'), sg.Button('Resume'), sg.Button('Quit')] 
 	]
 
@@ -92,7 +92,7 @@ def measure(values, pin_list):
 		#measure from adc
 		sample_list.append(chan0.value)
 		if len(sample_list) == samples_per_measurement: #took all measurements in the set 
-			print((nm_pos, sum(sample_list)))
+			print((nm_pos, sum(sample_list)/len(sample_list)))
 			measurement.append((nm_pos, sum(sample_list)/len(sample_list)))
 
 			#draw a line between the last two measurements
