@@ -126,7 +126,7 @@ def manual_control(pin_list_ex, pin_list_em):
         graph.Erase()
         if i >= 200:
             i = 0
-        points[i] = (i, chan.value/260)
+        points[i] = (i, chan0.value/110)
         for j in range (0, 200):
             graph.DrawPoint((points[j]), 1, color='green')
         window_manualControl['measure'].Update('{0:.1f}'.format(100*sin(3.1415629*1310*x) + 100))
