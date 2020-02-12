@@ -48,8 +48,7 @@ def measure(values, pin_list):
 	#setup ADC
 	# Data collection setup
 	RATE = 16
-	SAMPLES = 1000
-
+    
 	# Create the I2C bus with a fast frequency
 	i2c = busio.I2C(board.SCL, board.SDA, frequency=1000000)
 
