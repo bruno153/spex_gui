@@ -94,7 +94,7 @@ def measure(values, pin_list):
 		sample_list.append(chan0.value)
 		if len(sample_list) == samples_per_measurement: #took all measurements in the set 
 			print((nm_pos, sum(sample_list)))
-			measurement.append((nm_pos, sum(sample_list)/len(sample_list)*100))
+			measurement.append((nm_pos, sum(sample_list)/len(sample_list)))
 
 			#draw a line between the last two measurements
 			#if there's at least two elements in the measurement
