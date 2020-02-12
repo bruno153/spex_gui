@@ -45,16 +45,17 @@ def login():
 				if values2[0] in userlist:
 					sg.PopupOK('Clones não são bem vindos aqui.')
 			else:
-				userlist.append(values2[0])	
+				userlist.append(values2[0])
 				p.dump(userlist, open('users.p', 'wb'))
 
 		if event=='Delete User':
-			if len(values['input_user']) > 0 :
-				popup = sg.PopupYesNo('Are you sure you want to delete your whole research?')
-				if popup=='Yes':
-					userlist.remove(values['input_user'])
-					p.dump(userlist, open('users.p', 'wb'))
-			else:
+			try:
+				if len(values['input_user'][0]) > 0 :
+					popup = sg.PopupYesNo('Are you sure you want to delete your whole research?')
+					if popup=='Yes':
+						userlist.remove(values['input_user'][0])
+						p.dump(userlist, open('users.p', 'wb'))
+			except:
 				popup = sg.PopupOK('Select user to delete on last screen first.')
 
 		if event==None:
