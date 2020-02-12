@@ -2,7 +2,6 @@
 import sys
 sys.path.append('../')
 import PySimpleGUI as sg
-from math import sin
 from Hardware.DeclarativeStepControler import wave_step
 import board
 import busio
@@ -126,10 +125,11 @@ def manual_control(pin_list_ex, pin_list_em):
         graph.Erase()
         if i >= 200:
             i = 0
-        points[i] = (i, chan0.value/110)
+        data = chan0.value
+        points[i] = (i, data/110)
         for j in range (0, 200):
             graph.DrawPoint((points[j]), 1, color='green')
-        window_manualControl['measure'].Update('{0:.1f}'.format(100*sin(3.1415629*1310*x) + 100))
+        window_manualControl['measure'].Update('{0:.1f}'.format(data))
         x = x + 1
         i = i + 1
         

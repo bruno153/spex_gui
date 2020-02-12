@@ -66,7 +66,7 @@ def measure(values, pin_list):
 	layout_measure = [
 		[sg.Text('Measuring: '), sg.Text(str(nm_pos), size=(3, 1), key='text.nm')],
 		[sg.Text('Sample number: '), sg.Text(str(len(sample_list)), size=(2, 1), key='text.sample')],
-		[sg.Graph(canvas_size=(1200, 300), graph_bottom_left=(nm_start-5,-20), graph_top_right=(nm_stop+5,32000), background_color='white', key='graph')],
+		[sg.Graph(canvas_size=(600, 300), graph_bottom_left=(nm_start-5,-30), graph_top_right=(nm_stop+5,32000), background_color='white', key='graph')],
 		[sg.Button('Pause'), sg.Button('Resume'), sg.Button('Quit')] 
 	]
 
