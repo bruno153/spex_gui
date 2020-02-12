@@ -45,7 +45,7 @@ def manual_step(targetstep, pin_list):
 			sleep(stepInterval)
 			targetstep = targetstep + 1
 		stepPin.off()
-		print(stepPin.value)
+		#print(stepPin.value)
 
 def waveToSteps(wave):
     wave2 = wave	

@@ -4,6 +4,11 @@ import PySimpleGUI as sg
 import time
 from math import floor
 from Hardware.StepControler import wave_step
+import board
+import busio
+import adafruit_ads1x15.ads1015 as ADS
+from adafruit_ads1x15.ads1x15 import Mode
+from adafruit_ads1x15.analog_in import AnalogIn
 #for test purposes ONLY
 import random as rnd
 
@@ -40,8 +45,25 @@ def measure(values, pin_list):
 	wave_step(nm_start-nm_pos, pin_list)
 	nm_pos = nm_start
 
-	#setup GUI
+	#setup ADC
+	# Data collection setup
+	RATE = 16
+	SAMPLES = 1000
 
+	# Create the I2C bus with a fast frequency
+	i2c = busio.I2C(board.SCL, board.SDA, frequency=1000000)
+
+	# Create the ADC object using the I2C bus
+	ads = ADS.ADS1115(i2c)
+
+	# Create single-ended input on channel 0
+	chan0 = AnalogIn(ads, ADS.P0)
+
+	# ADC Configuration
+	ads.mode = Mode.CONTINUOUS
+	ads.data_rate = RATE
+
+	#setup GUI
 	layout_measure = [
 		[sg.Text('Measuring: '), sg.Text(str(nm_pos), size=(3, 1), key='text.nm')],
 		[sg.Text('Sample number: '), sg.Text(str(len(sample_list)), size=(2, 1), key='text.sample')],
@@ -68,10 +90,8 @@ def measure(values, pin_list):
 			event, values = window.read()
 		if event == 'Quit' or None:
 			break
-		#simulate measurement time
-		time.sleep(measure_time)
-		#get simulated value
-		sample_list.append(rnd.random())
+		#measure from adc
+		sample_list.append(chan0.value)
 		if len(sample_list) == samples_per_measurement: #took all measurements in the set 
 			print((nm_pos, sum(sample_list)))
 			measurement.append((nm_pos, sum(sample_list)/len(sample_list)*100))
