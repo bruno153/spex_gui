@@ -6,7 +6,7 @@ from math import floor
 from Hardware.StepControler import wave_step
 import board
 import busio
-import adafruit_ads1x15.ads1015 as ADS
+import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.ads1x15 import Mode
 from adafruit_ads1x15.analog_in import AnalogIn
 #for test purposes ONLY
@@ -67,7 +67,7 @@ def measure(values, pin_list):
 	layout_measure = [
 		[sg.Text('Measuring: '), sg.Text(str(nm_pos), size=(3, 1), key='text.nm')],
 		[sg.Text('Sample number: '), sg.Text(str(len(sample_list)), size=(2, 1), key='text.sample')],
-		[sg.Graph(canvas_size=(1200, 300), graph_bottom_left=(nm_start-5,-20), graph_top_right=(nm_stop+5,120), background_color='white', key='graph')],
+		[sg.Graph(canvas_size=(1200, 300), graph_bottom_left=(nm_start-5,-20), graph_top_right=(nm_stop+5,30000), background_color='white', key='graph')],
 		[sg.Button('Pause'), sg.Button('Resume'), sg.Button('Quit')] 
 	]
 
