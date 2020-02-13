@@ -35,40 +35,26 @@ def manual_step(targetstep, pin_list):
     stopPin1 = pin_list['stopPin1']
     stopPin2 = pin_list['stopPin2']
     stepPin.source_delay = 0.0025
-    
-    # while targetstep != 0:  
-        # if targetstep > 0 and stopPin2.value == 0: # gpio 23
-            # dirPin.off()
-            # stepPin.on()
-            # sleep(stepInterval)
-            # targetstep = targetstep - 1
-        # if targetstep < 0 and stopPin1.value == 0: # gpio 22
-            # dirPin.on()
-            # stepPin.on()
-            # sleep(stepInterval)
-            # targetstep = targetstep + 1
-        # stepPin.off()
-        # print(stepPin.value)
-    
+
     if targetstep > 0:
-        dirPin.off()
+        dirPin.on()
         stepPin.source = all_values(negated(stopPin2), stepGenerator(targetstep))
     else:
-        dirPin.on()
+        dirPin.off()
         targetstep = -targetstep
         stepPin.source = all_values(negated(stopPin1), stepGenerator(targetstep))
-    
+
 def stepGenerator(targetstep):
     blink = False
     for i in range (0, 2*targetstep + 1):
         yield blink
         blink = not blink
         #print(blink)
-    
+
 def waveToSteps(wave):
-    wave2 = wave    
+    wave2 = wave
     rate = 50 # steps/nm
     return int(rate*wave2)
-    
+
 def wave_step(targetwave, pin_list):
     manual_step(waveToSteps(targetwave), pin_list)

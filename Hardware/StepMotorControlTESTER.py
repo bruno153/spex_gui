@@ -11,21 +11,12 @@ para raspy
 import gpiozero as io
 from time import sleep
 
-from gpiozero.pins.mock import MockFactory
 
-io.Device.pin_factory = MockFactory()
-
-stepPin = io.DigitalOutputDevice(17)
-dirPin = io.DigitalOutputDevice(27)
+stepPin = io.DigitalOutputDevice(19)
+dirPin = io.DigitalOutputDevice(26)
 stepInterval = .005 # milliseconds
-stopPin1 = io.DigitalInputDevice(22) # positivo
-stopPin2 = io.DigitalInputDevice(23) # negativo
-
-stopPin1State = io.Device.pin_factory.pin(22)
-stopPin2State = io.Device.pin_factory.pin(23)
-
-stopPin1State.drive_high()
-stopPin2State.drive_high()
+stopPin1 = io.DigitalInputDevice(20) # positivo
+stopPin2 = io.DigitalInputDevice(21) # negativo
 
 stepPin.off()
 
