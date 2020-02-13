@@ -63,14 +63,16 @@ def measure(values, pin_list):
     chan0 = AnalogIn(ads, ADS.P0)
 
     # ADC Configuration
-    ads.mode = Mode.CONTINUOUS
+    ads.mode = Mode.SINGLE
     ads.data_rate = RATE
 
     #setup GUI
     layout_measure = [
         [sg.Text('Measuring: '), sg.Text(str(nm_pos), size=(3, 1), key='text.nm')],
-        [sg.Text('Sample number: '), sg.Text(str(len(sample_list)), size=(2, 1), key='text.sample')],
-        [sg.Graph(canvas_size=(600, 300), graph_bottom_left=(nm_start-5,-30), graph_top_right=(nm_stop+5,32000), background_color='white', key='graph')],
+        [sg.Text('Sample number: '), 
+            sg.Text(str(len(sample_list)), size=(2, 1), key='text.sample')],
+        [sg.Graph(canvas_size=(600, 300), graph_bottom_left=(nm_start-5,-30), 
+            graph_top_right=(nm_stop+5,32000), background_color='white', key='graph')],
         [sg.Button('Pause'), sg.Button('Resume'), sg.Button('Quit')]
     ]
 
@@ -106,12 +108,14 @@ def measure(values, pin_list):
 
             sample_list = []
             nm_pos += nm_step
-
-            #move stepper
-            wave_step(nm_step, pin_list)
+            
         if nm_pos > nm_stop: #the experiment has ended
             sg.PopupOK('End of the measures.\n Continuing to the results analises')
             break
+        
+        #move stepper
+        wave_step(nm_step, pin_list)
+        
         #update window
         window.Element('text.nm').update(str(nm_pos))
         window.Element('text.sample').update(str(len(sample_list)))

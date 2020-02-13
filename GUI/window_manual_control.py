@@ -68,7 +68,7 @@ def manual_control(pin_list_ex, pin_list_em):
     graph = window_manualControl['graph']
 
     while True:
-        manCtrl_event, values = window_manualControl.read(timeout=10)
+        manCtrl_event, values = window_manualControl.read(timeout=50)
         
         # quit condition
         if manCtrl_event in (None, 'Quit'):
