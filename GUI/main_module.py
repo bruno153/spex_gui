@@ -50,7 +50,7 @@ if values_manual_control is None: #retornamos None para indicar uma saida do pro
 	exit()
 
 #experiment setup window
-values_exp = exp_setup(pin_list)
+values_exp = exp_setup()
 if values_exp is None:
 	sg.PopupOK('Thank you for using LightWay')
 	print('exp_setup retornou None')
