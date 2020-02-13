@@ -30,7 +30,7 @@ vcc.on()
 
 pin_list['stepPin'].off()
 
-splash()
+#splash()
 
 #login screen
 user = login()

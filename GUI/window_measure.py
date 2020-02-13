@@ -40,11 +40,15 @@ def measure(values, pin_list):
 
 	#dummy values
 	measure_time = 1/samples_per_second
-
+    
+    #Going to initial position popup
+    loading_popup = sg.Popup('Movendo os monocromadores para as posições iniciais, aguarde.', 
+                             non_blocking=True, auto_close=True, auto_close_duration=1)
+    
 	#set to initial position
 	wave_step(nm_start-nm_pos, pin_list)
 	nm_pos = nm_start
-
+    
 	#setup ADC
 	# Data collection setup
 	RATE = 16

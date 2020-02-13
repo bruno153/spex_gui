@@ -10,7 +10,7 @@ from adafruit_ads1x15.ads1x15 import Mode
 from adafruit_ads1x15.analog_in import AnalogIn
 
 # Data collection setup
-RATE = 475
+RATE = 64
 
 # Create the I2C bus
 # Set frequency high to reduce time spent with I2C comms
@@ -29,7 +29,7 @@ ads.data_rate = RATE
 sg.ChangeLookAndFeel('DarkBlue')
 
 def manual_control(pin_list_ex, pin_list_em):
-
+    
     # Defaut values
     ex_val = 4000
     em_val = 3000
@@ -56,12 +56,11 @@ def manual_control(pin_list_ex, pin_list_em):
             sg.Text(str(em_val/10), justification='right', size=(5, 1), key='em_val')],
         [sg.Text('Measure: ', size=(22, 1)), 
             sg.Text('0', size=(5,1), justification='right', key='measure')],
-        [sg.Graph(canvas_size=(270, 270), graph_bottom_left=(0,0), 
-                  graph_top_right=(200, 200), background_color='white', key='graph')],
-        [sg.Quit(), sg.Submit()]
+        [sg.Graph(canvas_size=(460, 270), graph_bottom_left=(0,0), 
+                  graph_top_right=(3*RATE, 200), background_color='white', key='graph')],
+        [sg.Submit(), sg.Quit()]
 
     ]
-    x=0
     i=0
     points = [(i, 10) for i in range (0, 3*RATE)]
     window_manualControl = sg.Window('SPEX control', layout_manualControl)
@@ -82,7 +81,7 @@ def manual_control(pin_list_ex, pin_list_em):
         #Set and goto buttons handler
         if manCtrl_event=='set_btn':
             try:
-                temp_val = int(float(values['set_val'])*10)
+                temp_val = int(float(values['set_goto_val'])*10)
                 if values['ex']:
                     ex_val = temp_val
                     window_manualControl['ex_val'].Update(ex_val/10)
@@ -95,7 +94,7 @@ def manual_control(pin_list_ex, pin_list_em):
             
         if manCtrl_event=='goto_btn':
             try:
-                temp_val = int(float(values['set_val'])*10)
+                temp_val = int(float(values['set_goto_val'])*10)
                 if values['ex'] is True:
                     delta_val = temp_val - ex_val
                     ex_val = temp_val
@@ -123,14 +122,13 @@ def manual_control(pin_list_ex, pin_list_em):
         
         #'Real Time' measurement handler------ TODO
         graph.Erase()
-        if i >= 200:
+        if i >= 3*RATE:
             i = 0
         data = chan0.value
         points[i] = (i, data/110)
-        for j in range (0, 200):
+        for j in range (0, 3*RATE):
             graph.DrawPoint((points[j]), 1, color='green')
-        window_manualControl['measure'].Update('{0:.1f}'.format(data))
-        x = x + 1
+        window_manualControl['measure'].Update('{0:.1f}'.format(data/110))
         i = i + 1
         
     dic = {'nm_pos_ex': ex_val/10, 'nm_pos_em': em_val/10}
