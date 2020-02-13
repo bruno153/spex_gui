@@ -95,6 +95,7 @@ def measure(values, pin_list):
             event, values = window.read()
         if event == 'Quit' or None:
             break
+            
         #measure from adc
         sample_list.append(chan0.value)
         if len(sample_list) == samples_per_measurement: #took all measurements in the set
@@ -108,13 +109,13 @@ def measure(values, pin_list):
 
             sample_list = []
             nm_pos += nm_step
+            if nm_pos <= nm_stop:
+                #move stepper, but don't want to overshoot
+                wave_step(nm_step, pin_list)
             
         if nm_pos > nm_stop: #the experiment has ended
             sg.PopupOK('End of the measures.\n Continuing to the results analises')
             break
-        
-        #move stepper
-        wave_step(nm_step, pin_list)
         
         #update window
         window.Element('text.nm').update(str(nm_pos))

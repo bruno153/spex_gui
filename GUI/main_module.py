@@ -1,7 +1,10 @@
 import PySimpleGUI as sg
 import pickle as p
 import gpiozero as io
-from time import sleep
+#from time import sleep
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 from window_exp_setup import exp_setup
 from window_measure import measure
@@ -58,4 +61,12 @@ values_manual_control.update(values_exp)
 values = values_manual_control
 
 #get the measured values
-measure_results = measure(values, pin_list)
+measure_pos, measure_results = measure(values, pin_list)
+measure_pos = np.array(measure_pos)
+measure_results = np.array(measure_results)
+
+plt.plot(measure_pos, measure_results) # figure with plot
+plt.xlabel('nm')
+plt.ylabel('signal')
+plt.title('Measurements Results')
+plt.show()

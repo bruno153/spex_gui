@@ -12,22 +12,6 @@ import gpiozero as io
 from time import sleep
 from gpiozero.tools import all_values, negated
 
-# from gpiozero.pins.mock import MockFactory
-# io.Device.pin_factory = MockFactory()
-
-# stepPin = io.DigitalOutputDevice(17)
-# dirPin = io.DigitalOutputDevice(27)
-# stepInterval = .005 # milliseconds
-# stopPin1 = io.DigitalInputDevice(22) # positivo
-# stopPin2 = io.DigitalInputDevice(23) # negativo
-
-
-
-
-#stepPin.off()
-#wavelength = Serial.parseInt() # FUNÇÃO QUE VEM DO FRONT END ---------------
-
-
 def manual_step(targetstep, pin_list):
     stepInterval = pin_list['stepInterval']
     dirPin = pin_list['dirPin']
