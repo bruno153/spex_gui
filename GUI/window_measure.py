@@ -36,7 +36,8 @@ def measure(values, pin_list):
     #process calculation
     nm_pos = values['nm_pos_ex']
     sample_list = []
-    measurement = []
+    measurement_pos = []
+    measurement_result = []
 
     #dummy values
     measure_time = 1/samples_per_second
@@ -100,12 +101,13 @@ def measure(values, pin_list):
         sample_list.append(chan0.value)
         if len(sample_list) == samples_per_measurement: #took all measurements in the set
             print((nm_pos, sum(sample_list)/len(sample_list)))
-            measurement.append((nm_pos, sum(sample_list)/len(sample_list)))
+            measurement_pos.append(nm_pos)
+            measurement_result.append(sum(sample_list)/len(sample_list))
 
             #draw a line between the last two measurements
             #if there's at least two elements in the measurement
-            if len(measurement) > 1:
-                graph.DrawLine(measurement[-1], measurement[-2])
+            if len(measurement_pos) > 1:
+                graph.DrawLine((measurement_pos[-1], measurement_result[-1]), (measurement_pos[-2], measurement_result[-2]))
 
             sample_list = []
             nm_pos += nm_step
@@ -124,4 +126,4 @@ def measure(values, pin_list):
 
     #window.read()
     window.close()
-    return measurement
+    return measurement_pos, measurement_result
