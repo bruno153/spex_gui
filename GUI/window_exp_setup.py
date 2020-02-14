@@ -4,7 +4,7 @@ import PySimpleGUI as sg
 from pathlib import Path, PureWindowsPath
 
 sg.ChangeLookAndFeel('DarkBlue')
-
+    
 
 def exp_setup():
     sg.SetOptions(text_justification='left')
@@ -40,8 +40,8 @@ def exp_setup():
         [sg.Text('Measure: ', size=(20,1)), sg.Text('0.0', size=(4,1), 
                                                                 key='measure')],
         [sg.Text('_'*60)],
-        [sg.SaveAs(target=(None, None), enable_events=True, file_types=(('Text Files', '.txt'),),key='save_path'), 
-            sg.FileBrowse(target=(None, None), key='browser')],
+        [sg.Button('Save setup...', key='save_setup'), 
+            sg.Button('Open setup...', key='open_setup')],
         [sg.Button('Submit', size=(20,1), button_color=('black','green')), 
             sg.Quit(size=(10,1), button_color=('black','red'))]
     ]
@@ -78,18 +78,59 @@ def exp_setup():
         # if event=='manual_control':
             # manual_control()
         
-        if event=='save_path':
+        if event=='save_setup':
             # save the experiment setup to the file
-            print(values['save_path'])
-            file = open(PureWindowsPath(values['save_path']), 'w')
+            save_path = sg.PopupGetFile('Save experiment setup as..', save_as=True, file_types= (('setup files', '.txt'),),)
+            file = open(PureWindowsPath(save_path), 'w')
             for key in values.keys():
-                file.write(key + '=' + values[key])
+                if values[key] is '':
+                    values[key]=-1
+                file.write(key + '=' + str(values[key]) + '\n')
             file.close()
             
-        if event=='Browse':
+        if event=='open_setup':
             # open an experiment and fill the values
-            pass
-        
+            open_path = sg.PopupGetFile('Save experiment setup as..', file_types= (('setup files', '.txt'),),)
+            file = open(PureWindowsPath(open_path), 'r')
+            infos = file.readlines()
+            for line in infos:
+                line = line.rstrip('\n')
+                line = line.split('=')
+                if line[1]=='True':
+                    line[1] = True
+                elif line[1]=='False':
+                    line[1]=False
+                elif line[1]=='-1':
+                    line[1]=''
+                else:
+                    line[1]=int(float(line[1]))
+                window.Element(line[0]).Update(line[1])
+                values[line[0]]=line[1]
+                
+            #-------------------UPDATING THE ELEMENTS VALUES----------
+            if values['radio_em']:
+                window.Element('input_ex_en').Update(disabled=True)
+                window.Element('input_em_en').Update(disabled=False)
+                window.Element('input_ti').Update(disabled=True)
+                window.Element('input_in_s').Update(disabled=True)
+                window.Element('input_in_nm').Update(disabled=False)
+            if values['radio_ex']:
+                window.Element('input_ex_en').Update(disabled=False)
+                window.Element('input_em_en').Update(disabled=True)
+                window.Element('input_ti').Update(disabled=True)
+                window.Element('input_in_s').Update(disabled=True)
+                window.Element('input_in_nm').Update(disabled=False)
+            if values['radio_ki']:
+                window.Element('input_ex_en').Update(disabled=True)
+                window.Element('input_em_en').Update(disabled=True)
+                window.Element('input_ti').Update(disabled=False)
+                window.Element('input_in_s').Update(disabled=False)
+                window.Element('input_in_nm').Update(disabled=True)        
+            window.Element('text.slider').Update(str(values['integration_time']/10)+' s')
+             #-----------------END OF UPDATES-----------------------------       
+            
+            file.close()
+            
         if event in (None, 'Quit'):
             window.close()
             return None
@@ -97,12 +138,6 @@ def exp_setup():
             break
 
         #print(event)
-    print(values['save_path'])
-    file = open(PureWindowsPath(values['save_path']), 'w')
-    for key in values.keys():
-        file.write(key + '=' + str(values[key]) + '\n')
-    file.close()
-    window.close()
     
     for i in values:
         try:

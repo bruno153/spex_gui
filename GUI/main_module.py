@@ -61,12 +61,12 @@ values_manual_control.update(values_exp)
 values = values_manual_control
 
 #get the measured values
-measure_pos, measure_results = measure(values, pin_list)
-measure_pos = np.array(measure_pos)
-measure_results = np.array(measure_results)
+# measure_pos, measure_results = measure(values, pin_list)
+# measure_pos = np.array(measure_pos)
+# measure_results = np.array(measure_results)
 
-plt.plot(measure_pos, measure_results) # figure with plot
-plt.xlabel('nm')
-plt.ylabel('signal')
-plt.title('Measurements Results')
-plt.show()
+# plt.plot(measure_pos, measure_results) # figure with plot
+# plt.xlabel('nm')
+# plt.ylabel('signal')
+# plt.title('Measurements Results')
+# plt.show()

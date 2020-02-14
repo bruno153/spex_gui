@@ -69,11 +69,16 @@ def measure(values, pin_list):
 
     #setup GUI
     layout_measure = [
-        [sg.Text('Measuring: '), sg.Text(str(nm_pos), size=(3, 1), key='text.nm')],
+        [sg.Text('Measuring: '), 
+            sg.Text(str(nm_pos), size=(3, 1), key='text.nm')],
+        [sg.Text('Last measure: '), 
+            sg.Text('', justification='right', size=(8,1), key='last_measure')],
         [sg.Text('Sample number: '), 
             sg.Text(str(len(sample_list)), size=(2, 1), key='text.sample')],
         [sg.Graph(canvas_size=(600, 300), graph_bottom_left=(nm_start-5,-30), 
             graph_top_right=(nm_stop+5,32000), background_color='white', key='graph')],
+        [sg.Button('Export csv...', disabled=True, key='btn_csv'),
+            sg.Button('Show plot', disabled=True, key='btn_plot')],
         [sg.Button('Pause'), sg.Button('Resume'), sg.Button('Quit')]
     ]
 
@@ -102,7 +107,8 @@ def measure(values, pin_list):
         if len(sample_list) == samples_per_measurement: #took all measurements in the set
             print((nm_pos, sum(sample_list)/len(sample_list)))
             measurement_pos.append(nm_pos)
-            measurement_result.append(sum(sample_list)/len(sample_list))
+            last_measure = sum(sample_list)/len(sample_list)
+            measurement_result.append(last_measure)
 
             #draw a line between the last two measurements
             #if there's at least two elements in the measurement
@@ -122,8 +128,26 @@ def measure(values, pin_list):
         #update window
         window.Element('text.nm').update(str(nm_pos))
         window.Element('text.sample').update(str(len(sample_list)))
+        window.Element('last_measure').update(str(last_measure))
 
-
-    #window.read()
+    window.Element('btn_csv').update(disabled=False)
+    window.Element('btn_plot').update(disabled=False)
+    np_array_pos = np.array(measure_pos)
+    np_array_results = np.array(measure_results)
+    
+    while True:
+        event, values = window.read()
+        
+        if event == 'Quit' or None:
+            break
+        
+# TODO        if event=='btn_csv':                   
+            
+        if event=='btn_plot':
+            plt.plot(measure_pos, measure_results) # figure with plot
+            plt.xlabel('nm')
+            plt.ylabel('signal')
+            plt.title('Measurements Results')
+            plt.show()
     window.close()
     return measurement_pos, measurement_result
