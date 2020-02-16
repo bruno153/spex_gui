@@ -1,19 +1,41 @@
-import sys
-sys.path.append('../')
+from GUI.window_exp_setup import exp_setup
+import gpiozero as io
+from gpiozero.pins.mock import MockFactory
+import os
+from pathlib import Path, PureWindowsPath
+# import matplotlib.pyplot as plt
+# import numpy as np
 import PySimpleGUI as sg
-import time
 from math import floor
 from Hardware.StepControler import wave_step
-import board
-import busio
-import adafruit_ads1x15.ads1115 as ADS
-from adafruit_ads1x15.ads1x15 import Mode
-from adafruit_ads1x15.analog_in import AnalogIn
 #for test purposes ONLY
 import random as rnd
 
-import matplotlib.pyplot as plt
-import numpy as np
+#pin setup
+io.Device.pin_factory = MockFactory()
+
+pin_list = {}
+
+pin_list['stepPin'] = io.DigitalOutputDevice(17)
+pin_list['dirPin'] = io.DigitalOutputDevice(27)
+pin_list['stepInterval'] = .005 # milliseconds
+pin_list['stopPin1'] = io.DigitalInputDevice(22) # positivo
+pin_list['stopPin2'] = io.DigitalInputDevice(23) # negativo
+
+stopref1 = io.Device.pin_factory.pin(22)
+stopref2 = io.Device.pin_factory.pin(23)
+
+stopref1.drive_high()
+stopref2.drive_high()
+
+pin_list['stepPin'].off()
+
+# file = open(os.path.join('C:/Users/rafae/Desktop', 'hue.txt'), "w")
+# file.write('omgwtfbbq')
+# file.close()
+
+values = exp_setup()
+values['nm_pos_ex'] = 400
 
 sg.ChangeLookAndFeel('DarkBlue')
 
@@ -53,23 +75,6 @@ def measure(values, pin_list):
     wave_step(nm_start-nm_pos, pin_list)
     nm_pos = nm_start
 
-    #setup ADC
-    # Data collection setup
-    RATE = 16
-
-    # Create the I2C bus with a fast frequency
-    i2c = busio.I2C(board.SCL, board.SDA, frequency=1000000)
-
-    # Create the ADC object using the I2C bus
-    ads = ADS.ADS1115(i2c)
-
-    # Create single-ended input on channel 0
-    chan0 = AnalogIn(ads, ADS.P0)
-
-    # ADC Configuration
-    ads.mode = Mode.SINGLE
-    ads.data_rate = RATE
-
     #setup GUI
     layout_measure = [
         [sg.Text('Measuring: '), 
@@ -106,9 +111,8 @@ def measure(values, pin_list):
             break
             
         #measure from adc
-        sample_list.append(chan0.value)
+        sample_list.append(rnd.randint(0, 32676))
         if len(sample_list) == samples_per_measurement: #took all measurements in the set
-            print((nm_pos, sum(sample_list)/len(sample_list)))
             measurement_pos.append(nm_pos)
             last_measure = sum(sample_list)/len(sample_list)
             measurement_result.append(last_measure)
@@ -121,11 +125,12 @@ def measure(values, pin_list):
             sample_list = []
             nm_pos += nm_step
             if nm_pos <= nm_stop:
+                pass
                 #move stepper, but don't want to overshoot
-                wave_step(nm_step, pin_list)
+               # wave_step(nm_step, pin_list)
             
         if nm_pos > nm_stop: #the experiment has ended
-            sg.PopupOK('End of the measures.\n Continuing to the results analises')
+            sg.PopupOK('End of the measures.\n Remeber to save CSV.')
             break
         
         #update window
@@ -135,8 +140,8 @@ def measure(values, pin_list):
 
     window.Element('btn_csv').update(disabled=False)
     window.Element('btn_plot').update(disabled=False)
-    np_array_pos = np.array(measure_pos)
-    np_array_results = np.array(measure_results)
+    # np_array_pos = np.array(measurement_pos_pos)
+    # np_array_results = np.array(measurement_pos_results)
     
     while True:
         event, values = window.read()
@@ -144,13 +149,20 @@ def measure(values, pin_list):
         if event == 'Quit' or None:
             break
         
-# TODO        if event=='btn_csv':                   
-            
-        if event=='btn_plot':
-            plt.plot(measure_pos, measure_results) # figure with plot
-            plt.xlabel('nm')
-            plt.ylabel('signal')
-            plt.title('Measurements Results')
-            plt.show()
+        if event=='btn_csv':
+            save_csv_path = sg.PopupGetFile('Save experiment results as..', 
+                                            save_as=True, file_types= (('save files', '.csv'),),)
+            file = open(PureWindowsPath(save_csv_path), 'w')
+            for i in range (0, len(measurement_pos)):
+                file.write(str(measurement_pos[i]) + ',' + str(measurement_result[i]) + '\n')
+            file.close()
+        # if event=='btn_plot':
+            # plt.plot(measurement_pos, measurement_result) # figure with plot
+            # plt.xlabel('nm')
+            # plt.ylabel('signal')
+            # plt.title('Measurements Results')
+            # plt.show()
     window.close()
     return measurement_pos, measurement_result
+    
+measure(values, pin_list)

@@ -6,11 +6,11 @@ import gpiozero as io
 import matplotlib.pyplot as plt
 import numpy as np
 
-from window_exp_setup import exp_setup
-from window_measure import measure
-from window_login import login
-from window_manual_control import manual_control
-from window_splash import splash
+from GUI.window_exp_setup import exp_setup
+from GUI.window_measure import measure
+from GUI.window_login import login
+from GUI.window_manual_control import manual_control
+from GUI.window_splash import splash
 
 #from gpiozero.pins.mock import MockFactory
 #io.Device.pin_factory = MockFactory()
