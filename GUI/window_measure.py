@@ -1,5 +1,5 @@
-import sys
-sys.path.append('../')
+# import sys
+# sys.path.append('../')
 import PySimpleGUI as sg
 import time
 from math import floor
@@ -17,31 +17,42 @@ import numpy as np
 
 sg.ChangeLookAndFeel('DarkBlue')
 
-def waveToSteps(wave):
-    wave2 = wave	
-    rate = 5 # steps/nm
-    return int(rate*wave2)
-
-
-def measure(values, pin_list):
+def measure(values, pin_list_ex, pin_list_em):
+    loading_popup = sg.Popup('Movendo os monocromadores para as posições iniciais, aguarde.',
+                             non_blocking=True, auto_close=True, auto_close_duration=1)    
     #varables from setup
     if values['radio_ex']:
         nm_start = values['input_ex_st']
         nm_stop = values['input_ex_en']
-    else:
+        pin_list = pin_list_ex
+        nm_pos = values['nm_pos_ex']
+    elif values['radio_em']:
         nm_start = values['input_em_st']
         nm_stop = values['input_em_en']
+        pin_list = pin_list_em
+        nm_pos = values['nm_pos_em']
+    else:
+        pass
+    
+    # moving the monocrom to start positions
+    wave_step(values['input_ex_st'] - values['nm_pos_ex'], pin_list_ex)
+    wave_step(values['input_em_st'] - values['nm_pos_em'], pin_list_em)
+        
+    nm_pos = nm_start
     nm_step = values['input_in_nm']
     time_step = values['integration_time']
-    samples_per_second = 16
+    samples_per_second = 32
     samples_per_measurement = floor(samples_per_second*time_step)
 
-    #process calculation
-    nm_pos = values['nm_pos_ex']
+    #process calculation valrables and lists
     sample_list = []
+    lamp_sample_list = []
     measurement_pos = []
     measurement_result = []
-
+    lamp_correction = []
+    last_measure = -1
+    
+    
     #dummy values
     measure_time = 1/samples_per_second
 
@@ -50,24 +61,24 @@ def measure(values, pin_list):
                              non_blocking=True, auto_close=True, auto_close_duration=1)
 
     #set to initial position
-    wave_step(nm_start-nm_pos, pin_list)
-    nm_pos = nm_start
+    
 
     #setup ADC
     # Data collection setup
-    RATE = 16
+    RATE = samples_per_second
 
     # Create the I2C bus with a fast frequency
     i2c = busio.I2C(board.SCL, board.SDA, frequency=1000000)
 
-    # Create the ADC object using the I2C bus
-    ads = ADS.ADS1115(i2c)
-
-    # Create single-ended input on channel 0
+    # Create the ADC object using the I2C bus and the correct gain:
+    # gain=8 for .500 ~ v aprox
+    ads = ADS.ADS1115(i2c, 8)
+    # Create single-ended input on channel 0 and 1
     chan0 = AnalogIn(ads, ADS.P0)
+    chan1 = AnalogIn(ads, ADS.P1)
 
     # ADC Configuration
-    ads.mode = Mode.SINGLE
+    ads.mode = Mode.CONTINUOUS
     ads.data_rate = RATE
 
     #setup GUI
@@ -81,8 +92,9 @@ def measure(values, pin_list):
         [sg.Graph(canvas_size=(600, 300), graph_bottom_left=(nm_start-5,-30), 
             graph_top_right=(nm_stop+5,32000), background_color='white', key='graph')],
         [sg.Button('Export csv...', disabled=True, key='btn_csv'),
-            sg.Button('Show plot', disabled=True, key='btn_plot')],
-        [sg.Button('Pause'), sg.Button('Resume'), sg.Button('Quit')]
+            sg.Button('Show plot', disabled=True, key='btn_plot'),
+             sg.Button('New measure', disabled=True, key='btn_new')],
+        [sg.Button('Pause/Resume', key ='Pause'), sg.Button('Quit')]
     ]
 
     window = sg.Window('Working...', layout_measure)
@@ -97,16 +109,18 @@ def measure(values, pin_list):
         if x != 0:
             graph.DrawText( x, (x,-10), color='green')
 
-
     while True:
-        event, values = window.read(timeout=10)
+        startTime = time.monotonic()
+        event, values = window.read(timeout=max(measure_time*1000, 10))
         if event == 'Pause':
             event, values = window.read()
         if event == 'Quit' or None:
             break
             
         #measure from adc
+        startADCTime = time.monotonic()
         sample_list.append(chan0.value)
+        lamp_sample_list.append(chan1.value)
         if len(sample_list) == samples_per_measurement: #took all measurements in the set
             print((nm_pos, sum(sample_list)/len(sample_list)))
             measurement_pos.append(nm_pos)
@@ -125,18 +139,25 @@ def measure(values, pin_list):
                 wave_step(nm_step, pin_list)
             
         if nm_pos > nm_stop: #the experiment has ended
-            sg.PopupOK('End of the measures.\n Continuing to the results analises')
+            sg.PopupOK('End of the measures.\n REMEBER TO SAVE .CSV')
             break
         
         #update window
         window.Element('text.nm').update(str(nm_pos))
         window.Element('text.sample').update(str(len(sample_list)))
-        window.Element('last_measure').update(str(last_measure))
-
+        window.Element('last_measure').update(str(int(last_measure)))
+        stopTime = time.monotonic()
+        print(startTime - stopTime)
+        print(startADCTime - startTime)
+        print('\n\n')
+    # Update buttons states    
     window.Element('btn_csv').update(disabled=False)
     window.Element('btn_plot').update(disabled=False)
-    np_array_pos = np.array(measure_pos)
-    np_array_results = np.array(measure_results)
+    window.Element('Pause').update(disabled=True)
+    window.Element('btn_new').update(disabled=False)
+    
+    np_array_pos = np.array(measurement_pos)         # for matplotlib
+    np_array_results = np.array(measurement_result)  # for matplotlib
     
     while True:
         event, values = window.read()
@@ -144,13 +165,22 @@ def measure(values, pin_list):
         if event == 'Quit' or None:
             break
         
-# TODO        if event=='btn_csv':                   
-            
+        if event=='btn_csv':                   
+            save_csv_path = sg.PopupGetFile('Save experiment results as..', 
+                                            save_as=True, file_types= (('save files', '.csv'),),)
+            try:
+                file = open((save_csv_path), 'w')
+            except:
+                sg.PopupOK('Selecione um caminho de diretório decente')
+            for i in range (0, len(measurement_pos)):
+                file.write(str(measurement_pos[i]) + ',' + str(measurement_result[i]) + '\n')
+            file.close()
         if event=='btn_plot':
-            plt.plot(measure_pos, measure_results) # figure with plot
+            plt.plot(measurement_pos, measurement_result) # figure with plot
             plt.xlabel('nm')
             plt.ylabel('signal')
             plt.title('Measurements Results')
-            plt.show()
+            plt.show(block=False)
+    plt.close()
     window.close()
     return measurement_pos, measurement_result

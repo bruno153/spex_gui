@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append('../')
+# import sys
+# sys.path.append('../')
 import PySimpleGUI as sg
 from Hardware.DeclarativeStepControler import wave_step
 import board
@@ -38,14 +38,14 @@ def manual_control(pin_list_ex, pin_list_em):
     layout_manualControl = [
         [sg.Text('Manual Control', font=('Helvetica', 16))],
         [sg.Radio('Excitation', 'control', default=True, key='ex'), sg.Radio('Emission', 'control', key='em')],
-        [sg.Button('', size=(8, 1), key='-100', image_filename='assets/buttons/-100.png', image_size=(50,50), border_width=0), 
-        	sg.Button('', size=(7, 1), key='-10', image_filename='assets/buttons/-10.png', image_size=(50,50), border_width=0),
-            sg.Button('', size=(7, 1), key='-1', image_filename='assets/buttons/-1.png', image_size=(50,50), border_width=0), 
-            sg.Button('', size=(7, 1), key='-0.1', image_filename='assets/buttons/-0.1.png', image_size=(50,50), border_width=0),
-            sg.Button('', size=(7, 1), key='+0.1', image_filename='assets/buttons/+0.1.png', image_size=(50,50), border_width=0),
-            sg.Button('', size=(7, 1), key='+1', image_filename='assets/buttons/+1.png', image_size=(50,50), border_width=0), 
-            sg.Button('', size=(8, 1), key='+10', image_filename='assets/buttons/+10.png', image_size=(50,50), border_width=0), 
-        	sg.Button('', size=(7, 1), key='+100', image_filename='assets/buttons/+100.png', image_size=(50,50), border_width=0)
+        [sg.Button('', size=(8, 1), key='-100', image_filename='GUI/assets/buttons/-100.png', image_size=(60,60), border_width=0), 
+            sg.Button('', size=(7, 1), key='-10', image_filename='GUI/assets/buttons/-10.png', image_size=(60,60), border_width=0),
+            sg.Button('', size=(7, 1), key='-1', image_filename='GUI/assets/buttons/-1.png', image_size=(60,60), border_width=0), 
+            sg.Button('', size=(7, 1), key='-0.1', image_filename='GUI/assets/buttons/-0.1.png', image_size=(60,60), border_width=0),
+            sg.Button('', size=(7, 1), key='+0.1', image_filename='GUI/assets/buttons/+0.1.png', image_size=(60,60), border_width=0),
+            sg.Button('', size=(7, 1), key='+1', image_filename='GUI/assets/buttons/+1.png', image_size=(60,60), border_width=0), 
+            sg.Button('', size=(8, 1), key='+10', image_filename='GUI/assets/buttons/+10.png', image_size=(60,60), border_width=0), 
+            sg.Button('', size=(7, 1), key='+100', image_filename='GUI/assets/buttons/+100.png', image_size=(60,60), border_width=0)
         ],
         [sg.Button('Set value', size=(10,1), key='set_btn'), 
             sg.Button('Go to value', size=(10,1), key='goto_btn'), 

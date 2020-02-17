@@ -81,7 +81,7 @@ def exp_setup():
         if event=='save_setup':
             # save the experiment setup to the file
             save_path = sg.PopupGetFile('Save experiment setup as..', save_as=True, file_types= (('setup files', '.txt'),),)
-            file = open(PureWindowsPath(save_path), 'w')
+            file = open(save_path, 'w')
             for key in values.keys():
                 if values[key] is '':
                     values[key]=-1
@@ -90,8 +90,8 @@ def exp_setup():
             
         if event=='open_setup':
             # open an experiment and fill the values
-            open_path = sg.PopupGetFile('Save experiment setup as..', file_types= (('setup files', '.txt'),),)
-            file = open(PureWindowsPath(open_path), 'r')
+            open_path = sg.PopupGetFile('Open experiment setup.', file_types= (('setup files', '.txt'),),)
+            file = open((open_path), 'r')
             infos = file.readlines()
             for line in infos:
                 line = line.rstrip('\n')
@@ -136,8 +136,6 @@ def exp_setup():
             return None
         if event=='Submit':
             break
-
-        #print(event)
     
     for i in values:
         try:
@@ -145,6 +143,6 @@ def exp_setup():
         except:
             pass
 
-
     values['integration_time'] = values['integration_time']/10
+    window.close()
     return values

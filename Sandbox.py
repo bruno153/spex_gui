@@ -39,12 +39,6 @@ values['nm_pos_ex'] = 400
 
 sg.ChangeLookAndFeel('DarkBlue')
 
-def waveToSteps(wave):
-    wave2 = wave	
-    rate = 5 # steps/nm
-    return int(rate*wave2)
-
-
 def measure(values, pin_list):
     #varables from setup
     if values['radio_ex']:

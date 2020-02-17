@@ -16,52 +16,61 @@ from GUI.window_splash import splash
 #io.Device.pin_factory = MockFactory()
 
 # Pin setup
-pin_list = {}
+pin_list_em = {}
 
-pin_list['stepPin'] = io.DigitalOutputDevice(19)
-pin_list['dirPin'] = io.DigitalOutputDevice(26)
-pin_list['stepInterval'] = .005 # milliseconds
-pin_list['stopPin1'] = io.DigitalInputDevice(20, pull_up=True) # positivo
-pin_list['stopPin2'] = io.DigitalInputDevice(21, pull_up=True) # negativo
-vcc = io.DigitalOutputDevice(16)
-vcc.on()
+pin_list_em['stepPin'] = io.DigitalOutputDevice(25)
+pin_list_em['dirPin'] = io.DigitalOutputDevice(8)
+pin_list_em['stepInterval'] = .005 # milliseconds
+pin_list_em['stopPin1'] = io.DigitalInputDevice(7, pull_up=True) # positivo
+pin_list_em['stopPin2'] = io.DigitalInputDevice(1, pull_up=True) # negativo
+
+# Pin setup
+pin_list_ex = {}
+
+pin_list_ex['stepPin'] = io.DigitalOutputDevice(19)
+pin_list_ex['dirPin'] = io.DigitalOutputDevice(26)
+pin_list_ex['stepInterval'] = .005 # milliseconds
+pin_list_ex['stopPin1'] = io.DigitalInputDevice(20, pull_up=True) # positivo
+pin_list_ex['stopPin2'] = io.DigitalInputDevice(21, pull_up=True) # negativo
+
 # stopref1 = io.Device.pin_factory.pin(22)
 # stopref2 = io.Device.pin_factory.pin(23)
 
 # stopref1.drive_high()
 # stopref2.drive_high()
 
-pin_list['stepPin'].off()
+pin_list_em['stepPin'].off()
+pin_list_ex['stepPin'].off()
 
 #splash()
 
 #login screen
 user = login()
 if user == None:
-	exit()
+    exit()
 print(user)
 
 #manual control window
-values_manual_control = manual_control(pin_list, pin_list)
+values_manual_control = manual_control(pin_list_ex, pin_list_em)
 
 if values_manual_control is None: #retornamos None para indicar uma saida do programa
-	sg.PopupOK('Thank you for using LightWay')
-	print('manual_control retornou None')
-	exit()
+    sg.PopupOK('Thank you for using LightWay')
+    print('manual_control retornou None')
+    exit()
 
 #experiment setup window
 values_exp = exp_setup()
 if values_exp is None:
-	sg.PopupOK('Thank you for using LightWay')
-	print('exp_setup retornou None')
-	exit()
+    sg.PopupOK('Thank you for using LightWay')
+    print('exp_setup retornou None')
+    exit()
 
 #merge two dictionaries into values
 values_manual_control.update(values_exp)
 values = values_manual_control
 
 #get the measured values
-# measure_pos, measure_results = measure(values, pin_list)
+measure_pos, measure_results = measure(values, pin_list_ex, pin_list_em)
 # measure_pos = np.array(measure_pos)
 # measure_results = np.array(measure_results)
 
