@@ -17,7 +17,7 @@ RATE = 64
 i2c = busio.I2C(board.SCL, board.SDA, frequency=1000000)
 
 # Create the ADC object using the I2C bus
-ads = ADS.ADS1115(i2c)
+ads = ADS.ADS1115(i2c, 4)
 
 # Create single-ended input on channel 0
 chan0 = AnalogIn(ads, ADS.P0)
@@ -125,10 +125,10 @@ def manual_control(pin_list_ex, pin_list_em):
         if i >= 3*RATE:
             i = 0
         data = chan0.value
-        points[i] = (i, data/110)
+        points[i] = (i, data/327.67)
         for j in range (0, 3*RATE):
             graph.DrawPoint((points[j]), 1, color='green')
-        window_manualControl['measure'].Update('{0:.1f}'.format(data/110))
+        window_manualControl['measure'].Update('{0:.1f}'.format(data))
         i = i + 1
         
     dic = {'nm_pos_ex': ex_val/10, 'nm_pos_em': em_val/10}

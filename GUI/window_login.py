@@ -2,11 +2,14 @@ import PySimpleGUI as sg
 import pickle as p
 import os
 import shutil
+from pathlib import Path
 
 sg.ChangeLookAndFeel('DarkBlue')
-
-userlist = p.load(open('users.p', 'rb'))
-
+try:
+    userlist = p.load(open('users.p', 'rb'))
+except:
+    raise
+path = Path.home()/'Documents'/'SPEX_users'
 
 
 '''
@@ -16,7 +19,7 @@ layout_areyousure = [
 ]'''
 
 def login():
-    
+    global path
     layout_login = [
             [sg.Text('User'), 
                 sg.Listbox(userlist, size=(10, 2), key='input_user')],
@@ -24,10 +27,9 @@ def login():
         ]
 
     window = sg.Window('SPEX control', layout_login)
-    path = '/home/pi/Documents/SPEX_users'
     while True:
         event, values = window.read()
-
+        window.close()
         if event=='New User':
             layout_newuser = [
                 [sg.Text('User name: '), 
@@ -50,29 +52,30 @@ def login():
             else:
                 userlist.append(values2[0])
                 p.dump(userlist, open('users.p', 'wb'))
-                os.mkdir(path + values2[0], 0755)
-                
+                path_new = path/values2[0]
+                path_new.mkdir()                
 
         if event=='Delete User':
             try:
                 if len(values['input_user'][0]) > 0:
                     popup = sg.PopupYesNo('Are you sure you want to delete your whole research?\n Make sure you have a back up of your results.')
                     if popup=='Yes':
-                        shutil.rmtree(path + values['input_user'][0])
+                        path_new = path/values['input_user']
+                        shutil.rmtree(path_new)
                         userlist.remove(values['input_user'][0])
                         p.dump(userlist, open('users.p', 'wb'))
             except:
                 popup = sg.PopupOK('Select user to delete on last screen first.')
 
         if event==None:
-            window.close()
-            return None
+            return None, None
 
         if event=='Login':
             if len(values['input_user']) == 0:
                 sg.PopupOK('Please select a user.')
             else:
                 p.dump(userlist, open('users.p', 'wb'))
+                path = path/values['input_user']
                 window.close()
-                return values['input_user']
+                return values['input_user'], path
 

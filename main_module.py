@@ -45,7 +45,7 @@ pin_list_ex['stepPin'].off()
 #splash()
 
 #login screen
-user = login()
+user, work_path = login()
 if user == None:
     exit()
 print(user)
