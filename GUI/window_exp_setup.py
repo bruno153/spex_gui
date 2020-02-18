@@ -1,12 +1,12 @@
 import PySimpleGUI as sg
 #from window_manual_control import manual_control
 
-from pathlib import Path, PureWindowsPath
+from pathlib import Path
 
 sg.ChangeLookAndFeel('DarkBlue')
     
 
-def exp_setup():
+def exp_setup(work_path):
     sg.SetOptions(text_justification='left')
     layout = [
         [sg.Text('Experiment', size=(20,1)), 
@@ -80,7 +80,10 @@ def exp_setup():
         
         if event=='save_setup':
             # save the experiment setup to the file
-            save_path = sg.PopupGetFile('Save experiment setup as..', save_as=True, file_types= (('setup files', '.txt'),),)
+            save_path = sg.PopupGetFile('Save experiment setup as..', 
+                                        initial_folder=str(work_path),
+                                        save_as=True, 
+                                        file_types= (('setup files', '.txt'),),)
             file = open(save_path, 'w')
             for key in values.keys():
                 if values[key] is '':
@@ -90,7 +93,9 @@ def exp_setup():
             
         if event=='open_setup':
             # open an experiment and fill the values
-            open_path = sg.PopupGetFile('Open experiment setup.', file_types= (('setup files', '.txt'),),)
+            open_path = sg.PopupGetFile('Open experiment setup.', 
+                                        initial_folder=str(work_path),
+                                        file_types= (('setup files', '.txt'),),)
             file = open((open_path), 'r')
             infos = file.readlines()
             for line in infos:
@@ -146,3 +151,4 @@ def exp_setup():
     values['integration_time'] = values['integration_time']/10
     window.close()
     return values
+# exp_setup(Path.home()/'Documents'/'SPEX_users')

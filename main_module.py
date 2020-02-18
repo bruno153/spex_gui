@@ -59,7 +59,7 @@ if values_manual_control is None: #retornamos None para indicar uma saida do pro
     exit()
 
 #experiment setup window
-values_exp = exp_setup()
+values_exp = exp_setup(work_path)
 if values_exp is None:
     sg.PopupOK('Thank you for using LightWay')
     print('exp_setup retornou None')
@@ -70,7 +70,7 @@ values_manual_control.update(values_exp)
 values = values_manual_control
 
 #get the measured values
-measure_pos, measure_results = measure(values, pin_list_ex, pin_list_em)
+measure_pos, measure_results = measure(values, pin_list_ex, pin_list_em, work_path)
 # measure_pos = np.array(measure_pos)
 # measure_results = np.array(measure_results)
 

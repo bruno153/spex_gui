@@ -9,15 +9,15 @@ import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.ads1x15 import Mode
 from adafruit_ads1x15.analog_in import AnalogIn
-#for test purposes ONLY
-import random as rnd
+
+import random as rnd      #for test purposes ONLY
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 sg.ChangeLookAndFeel('DarkBlue')
 
-def measure(values, pin_list_ex, pin_list_em):
+def measure(values, pin_list_ex, pin_list_em, work_path):
     loading_popup = sg.Popup('Movendo os monocromadores para as posições iniciais, aguarde.',
                              non_blocking=True, auto_close=True, auto_close_duration=1)    
     #varables from setup
@@ -110,7 +110,7 @@ def measure(values, pin_list_ex, pin_list_em):
             graph.DrawText( x, (x,-10), color='green')
 
     while True:
-        startTime = time.monotonic()
+        # startTime = time.monotonic()
         event, values = window.read(timeout=max(measure_time*1000, 10))
         if event == 'Pause':
             event, values = window.read()
@@ -118,7 +118,7 @@ def measure(values, pin_list_ex, pin_list_em):
             break
             
         #measure from adc
-        startADCTime = time.monotonic()
+        # startADCTime = time.monotonic()
         sample_list.append(chan0.value)
         lamp_sample_list.append(chan1.value)
         if len(sample_list) == samples_per_measurement: #took all measurements in the set
@@ -147,9 +147,10 @@ def measure(values, pin_list_ex, pin_list_em):
         window.Element('text.sample').update(str(len(sample_list)))
         window.Element('last_measure').update(str(int(last_measure)))
         stopTime = time.monotonic()
-        print(startTime - stopTime)
-        print(startADCTime - startTime)
-        print('\n\n')
+        # print(startTime - stopTime)
+        # print(startADCTime - startTime)
+        # print('\n\n')
+        
     # Update buttons states    
     window.Element('btn_csv').update(disabled=False)
     window.Element('btn_plot').update(disabled=False)
@@ -167,11 +168,13 @@ def measure(values, pin_list_ex, pin_list_em):
         
         if event=='btn_csv':                   
             save_csv_path = sg.PopupGetFile('Save experiment results as..', 
-                                            save_as=True, file_types= (('save files', '.csv'),),)
+                                            initial_folder=str(work_path)
+                                            save_as=True, 
+                                            file_types= (('save files', '.csv'),),)
             try:
                 file = open((save_csv_path), 'w')
             except:
-                sg.PopupOK('Selecione um caminho de diretório decente')
+                sg.PopupOK('Nome vazio ou você desistiu de salvar.\nNão recomendado.')
             for i in range (0, len(measurement_pos)):
                 file.write(str(measurement_pos[i]) + ',' + str(measurement_result[i]) + '\n')
             file.close()
