@@ -140,6 +140,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
         #measure from adc
         if type_kinectics is False or currend_time - lap_time >= seconds_step:
             sample_list.append(chan0.value)
+            print(sample_list[-1])
             lamp_sample_list.append(chan1.value)
             if len(sample_list) == samples_per_measurement: #took all measurements in the set
                 # print((nm_pos, sum(sample_list)/len(sample_list)))
@@ -148,7 +149,9 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
                 else:
                     measurement_pos.append(currend_time - start_exp_time)
                 last_measure = sum(sample_list)/len(sample_list)
+                lamp_last_measure = sum(lamp_sample_list)/len(lamp_sample_list)
                 measurement_result.append(last_measure)
+                lamp_correction.append(lamp_last_measure)
                 lap_time = currend_time
 
                 #draw a line between the last two measurements
@@ -157,9 +160,10 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
                     graph.DrawLine((measurement_pos[-1], measurement_result[-1]), (measurement_pos[-2], measurement_result[-2]))
 
                 sample_list = []
-                if type_kinectics is False and nm_pos <= nm_stop:
-                    nm_pos += nm_step
+                lamp_sample_list = []
+                if type_kinectics is False and nm_pos < nm_stop:
                     #move stepper, but don't want to overshoot
+                    nm_pos += nm_step
                     wave_step(nm_step, pin_list)
 
             if (type_kinectics is False and nm_pos > nm_stop or
@@ -184,6 +188,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
 
     np_array_pos = np.array(measurement_pos)         # for matplotlib
     np_array_results = np.array(measurement_result)  # for matplotlib
+    np_array_lamp = np.array(lamp_correction)
 
     while True:
         event, values = window.read()
@@ -200,6 +205,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
                 file = open((save_csv_path), 'w')
             except:
                 sg.PopupOK('Empty name or you canceled the save operation.\nNOT RECOMENDED.')
+            file.write('Wavelenght, measured value, lamp value')
             for i in range (0, len(measurement_pos)):
                 file.write(str(measurement_pos[i]) + ',' + str(measurement_result[i]) + '\n')
             file.close()
