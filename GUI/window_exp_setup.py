@@ -151,4 +151,4 @@ def exp_setup(work_path):
     values['integration_time'] = values['integration_time']/10
     window.close()
     return values
-exp_setup(Path.home()/'Documents'/'SPEX_users')
+# exp_setup(Path.home()/'Documents'/'SPEX_users')

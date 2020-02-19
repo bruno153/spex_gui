@@ -72,6 +72,7 @@ values = values_manual_control
 
 #get the measured values
 measure_pos, measure_results = measure(values, pin_list_ex, pin_list_em, work_path)
+sg.PopupOK('Thank you for using LightWay')
 # measure_pos = np.array(measure_pos)
 # measure_results = np.array(measure_results)
 

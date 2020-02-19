@@ -23,13 +23,13 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
         nm_start = values['input_ex_st']
         nm_stop = values['input_ex_en']
         pin_list = pin_list_ex
-        nm_pos = values['nm_pos_ex']
+        nm_pos = nm_start
         type_kinectics = False
     elif values['radio_em']:
         nm_start = values['input_em_st']
         nm_stop = values['input_em_en']
         pin_list = pin_list_em
-        nm_pos = values['nm_pos_em']
+        nm_pos = nm_start
         type_kinectics = False
 
     else:
@@ -37,12 +37,14 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
         seconds_step = values['input_in_s']
         type_kinectics = True
 
+    #Going to initial position popup
+    loading_popup = sg.Popup('Movendo os monocromadores para as posições iniciais, aguarde.',
+                             non_blocking=True, auto_close=True, auto_close_duration=1)
+
     # moving the monocrom to start positions
     wave_step(values['input_ex_st'] - values['nm_pos_ex'], pin_list_ex)
     wave_step(values['input_em_st'] - values['nm_pos_em'], pin_list_em)
 
-
-    nm_pos = nm_start
     nm_step = values['input_in_nm']
     time_step = values['integration_time']
     samples_per_second = 32
@@ -59,13 +61,6 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
 
     #dummy values
     measure_time = 1/samples_per_second
-
-    #Going to initial position popup
-    loading_popup = sg.Popup('Movendo os monocromadores para as posições iniciais, aguarde.',
-                             non_blocking=True, auto_close=True, auto_close_duration=1)
-
-    #set to initial position
-
 
     #setup ADC
     # Data collection setup
@@ -92,6 +87,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
     else:
         graph_label_start = 0
         graph_label_stop = reaction_time
+        nm_pos = '---'
 
     layout_measure = [
         [sg.Text('Measuring: '),
@@ -126,7 +122,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
     sg.PopupOK('Press \'OK\' to start.', title='Ready to go', non_blocking=False)
 
     start_exp_time = time.monotonic()
-    lap_time = start_exp_time
+    lap_time = start_exp_time - seconds_step
     while True:
         event, values = window.read(timeout=max(measure_time*1000, 10))
         currend_time = time.monotonic()
@@ -137,12 +133,15 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             break
 
         #measure from adc
-        if kinectics is False or currend_time - lap_time >= seconds_step:
+        if type_kinectics is False or currend_time - lap_time >= seconds_step:
             sample_list.append(chan0.value)
             lamp_sample_list.append(chan1.value)
             if len(sample_list) == samples_per_measurement: #took all measurements in the set
                 # print((nm_pos, sum(sample_list)/len(sample_list)))
-                measurement_pos.append(nm_pos)
+                if type_kinectics is False:
+                    measurement_pos.append(nm_pos)
+                else:
+                    measurement_pos.append(currend_time - start_exp_time)
                 last_measure = sum(sample_list)/len(sample_list)
                 measurement_result.append(last_measure)
                 lap_time = currend_time
@@ -177,7 +176,6 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
     window.Element('btn_csv').update(disabled=False)
     window.Element('btn_plot').update(disabled=False)
     window.Element('Pause').update(disabled=True)
-    window.Element('btn_new').update(disabled=False)
 
     np_array_pos = np.array(measurement_pos)         # for matplotlib
     np_array_results = np.array(measurement_result)  # for matplotlib

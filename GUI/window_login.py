@@ -61,7 +61,10 @@ def login():
                 popup = sg.PopupYesNo('Are you sure you want to delete your whole research?\n Make sure you have a back up of your results.')
                 if popup=='Yes':
                     path_new = path/values['input_user'][0]
-                    shutil.rmtree(path_new)
+                    try:
+                        shutil.rmtree(path_new)
+                    except:
+                        sg.Popup('Não encontramos esse diretório para deletar... Estranho.')
                     userlist.remove(values['input_user'][0])
                     p.dump(userlist, open('users.p', 'wb'))
             else:
