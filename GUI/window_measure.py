@@ -24,18 +24,23 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
         nm_stop = values['input_ex_en']
         pin_list = pin_list_ex
         nm_pos = nm_start
+        reaction_time = 0
+        seconds_step=0
         type_kinectics = False
     elif values['radio_em']:
         nm_start = values['input_em_st']
         nm_stop = values['input_em_en']
         pin_list = pin_list_em
         nm_pos = nm_start
+        reaction_time=0
+        seconds_step=0
         type_kinectics = False
 
     else:
+        type_kinectics = True
         reaction_time = values['input_ti']
         seconds_step = values['input_in_s']
-        type_kinectics = True
+        
 
     #Going to initial position popup
     loading_popup = sg.Popup('Movendo os monocromadores para as posições iniciais, aguarde.',

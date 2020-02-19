@@ -21,6 +21,7 @@ ads = ADS.ADS1115(i2c, 8)
 
 # Create single-ended input on channel 0
 chan0 = AnalogIn(ads, ADS.P0)
+chan1 = AnalogIn(ads, ADS.P1)
 
 # ADC Configuration
 ads.mode = Mode.CONTINUOUS
@@ -55,9 +56,9 @@ def manual_control(pin_list_ex, pin_list_em):
         [sg.Text('Current emition: ', size=(22, 1)), 
             sg.Text(str(em_val/10), justification='right', size=(5, 1), key='em_val')],
         [sg.Text('Measure: ', size=(22, 1)), 
-            sg.Text('0', size=(5,1), justification='right', key='measure')],
+            sg.Text('0', size=(7,1), justification='right', key='measure')],
         [sg.Graph(canvas_size=(460, 270), graph_bottom_left=(0,0), 
-                  graph_top_right=(3*RATE, 200), background_color='white', key='graph')],
+                  graph_top_right=(3*RATE, 32767), background_color='white', key='graph')],
         [sg.Submit(), sg.Quit()]
 
     ]
@@ -125,8 +126,9 @@ def manual_control(pin_list_ex, pin_list_em):
         graph.Erase()
         if i >= 3*RATE:
             i = 0
+        data1 = chan1.value
         data = chan0.value
-        points[i] = (i, data/327.67)
+        points[i] = (i, data)
         for j in range (0, 3*RATE):
             graph.DrawPoint((points[j]), 1, color='green')
         window_manualControl['measure'].Update('{0:.1f}'.format(data))
