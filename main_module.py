@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import PySimpleGUI as sg
 import pickle as p
 import gpiozero as io

@@ -17,7 +17,7 @@ RATE = 64
 i2c = busio.I2C(board.SCL, board.SDA, frequency=1000000)
 
 # Create the ADC object using the I2C bus
-ads = ADS.ADS1115(i2c, 4)
+ads = ADS.ADS1115(i2c, 8)
 
 # Create single-ended input on channel 0
 chan0 = AnalogIn(ads, ADS.P0)
@@ -108,6 +108,7 @@ def manual_control(pin_list_ex, pin_list_em):
             except:
                 sg.PopupOK('Escreva um número (use ponto para o decimal)', title='Erro')
             window_manualControl['set_goto_val'].Update('')
+        
         #Step Motor control handler
         if manCtrl_event in ('-100', '-10', '-1', '-0.1', '+100', '+10', '+1', '+0.1'):
             val = int(float(manCtrl_event)*10)
@@ -120,7 +121,7 @@ def manual_control(pin_list_ex, pin_list_em):
                 em_val = em_val + val
                 window_manualControl['em_val'].Update(em_val/10)
         
-        #'Real Time' measurement handler------ TODO
+        #'Real Time' measurement handler
         graph.Erase()
         if i >= 3*RATE:
             i = 0

@@ -37,8 +37,8 @@ def exp_setup(work_path):
         [sg.Text('Total reaction time', size=(20,1)), 
             sg.Input(size=(4,1), disabled=True, key='input_ti'),
             sg.Text('s', justification='left')],
-        [sg.Text('Measure: ', size=(20,1)), sg.Text('0.0', size=(4,1), 
-                                                                key='measure')],
+        # [sg.Text('Measure: ', size=(20,1)), sg.Text('0.0', size=(4,1), 
+                                                                # key='measure')],
         [sg.Text('_'*60)],
         [sg.Button('Save setup...', key='save_setup'), 
             sg.Button('Open setup...', key='open_setup')],
@@ -151,4 +151,4 @@ def exp_setup(work_path):
     values['integration_time'] = values['integration_time']/10
     window.close()
     return values
-# exp_setup(Path.home()/'Documents'/'SPEX_users')
+exp_setup(Path.home()/'Documents'/'SPEX_users')

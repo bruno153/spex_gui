@@ -49,7 +49,7 @@ def login():
                 if len(values2[0]) == 0:
                     sg.PopupOK('Coloca nome direito caralho.')
                 if values2[0] in userlist:
-                    sg.PopupOK('Clones não são bem vindos aqui.')
+                    sg.PopupOK('The \'no clone theorem\' is aplied here.\nTry a different username')
             else:
                 userlist.append(values2[0])
                 p.dump(userlist, open('users.p', 'wb'))
