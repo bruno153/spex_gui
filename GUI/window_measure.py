@@ -140,7 +140,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
         #measure from adc
         if type_kinectics is False or currend_time - lap_time >= seconds_step:
             sample_list.append(chan0.value)
-            print(sample_list[-1])
+            print('This measure sample is: {}', format(sample_list[-1]))
             lamp_sample_list.append(chan1.value)
             if len(sample_list) == samples_per_measurement: #took all measurements in the set
                 # print((nm_pos, sum(sample_list)/len(sample_list)))
