@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # import sys
 # sys.path.append('../')
+
 import PySimpleGUI as sg
 from Hardware.DeclarativeStepControler import wave_step
 from gpiozero import MCP3208
-
 
 # Create input on channel 0 of MCP3208
 adc_photo = MCP3208(channel=0)
@@ -12,12 +12,25 @@ adc_photo = MCP3208(channel=0)
 # start of GUI design
 sg.ChangeLookAndFeel('DarkBlue')
 
+def _mean_list(list):
+    return sum(list)/len(list)
+
+def sample_measure(adc_photo, SAMPLES=5000):
+    '''.return the mean value of SAMPLES measures of the mcp3208.'''
+    measure_photo = [None]*SAMPLES
+    start = time.monotonic()
+    for i in range (0, SAMPLES):
+        measure_photo[i] = adc_photo.value
+    currend = time.monotonic()
+    mean_photo = _mean_list(measure_photo)
+    elapsed_time = currend - start
+    return mean_photo, elapsed_time
+
 def manual_control(pin_list_ex, pin_list_em):
-    
     # Defaut mono values
     ex_val = 4000
     em_val = 3000
-
+    RATE = 100
     sg.SetOptions(text_justification='left')
     layout_manualControl = [
         [sg.Text('Manual Control', font=('Helvetica', 16))],
@@ -109,7 +122,7 @@ def manual_control(pin_list_ex, pin_list_em):
         graph.Erase()
         if i >= 3*RATE:
             i = 0
-        data = adc_photo.value
+        data = sample_measure(adc_photo)
         points[i] = (i, data)
         for j in range (0, 3*RATE):
             graph.DrawPoint((points[j]), 1, color='green')
@@ -119,7 +132,3 @@ def manual_control(pin_list_ex, pin_list_em):
     dic = {'nm_pos_ex': ex_val/10, 'nm_pos_em': em_val/10}
     window_manualControl.close()
     return dic
-    
-if __name__ == '__main__':
-    # for easy local test
-    manual_control({},{})

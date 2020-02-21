@@ -1,11 +1,12 @@
 import PySimpleGUI as sg
 import time
 from math import floor
-
-import random as rnd      #for test purposes ONLY
+from gpiozero import MCP3208
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+import random as rnd        # for test purposes ONLY
 
 sg.ChangeLookAndFeel('DarkBlue')
 
@@ -13,7 +14,7 @@ def _mean_list(list):
     return sum(list)/len(list)
 
 
-def sample_measure(adc_photo, adc_diode, SAMPLES=5000):
+def _sample_measure(adc_photo, adc_diode, SAMPLES=5000):
     '''.return the mean value of SAMPLES measures of the mcp3208.'''
     measure_photo = [None]*SAMPLES
     measure_diode = [None]*SAMPLES
@@ -27,7 +28,7 @@ def sample_measure(adc_photo, adc_diode, SAMPLES=5000):
     elapsed_time = currend - start
     return mean_photo, mean_diode, elapsed_time
 
-def timed_measure(adc_photo, adc_diode, time, SAMPLES=100):
+def _timed_measure(adc_photo, adc_diode, time, SAMPLES=1000):
     '''return mean value of as many measures can be made in 'time' seconds.'''
     measure_photo = [None]*SAMPLES
     measure_diode = [None]*SAMPLES
@@ -68,8 +69,8 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
         type_kinectics = False
     else:
         type_kinectics = True
-        reaction_time = values['input_ti']
-        seconds_step = values['input_in_s']
+        reaction_time = values['input_ti']  # total experiment time
+        seconds_step = values['input_in_s'] # rest time between measures
         
 
     #Going to initial position popup
@@ -80,40 +81,31 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
     wave_step(values['input_ex_st'] - values['nm_pos_ex'], pin_list_ex)
     wave_step(values['input_em_st'] - values['nm_pos_em'], pin_list_em)
 
-    nm_step = values['input_in_nm']
+    nm_step = values['input_in_nm']             # step size between measures
     time_step = values['integration_time']
-    samples_per_second = 30000
-    samples_per_measurement = floor(samples_per_second*time_step)
+    # samples_per_second = 30000
+    # samples_per_measurement = floor(samples_per_second*time_step)
 
     #process calculation valrables and lists
-    sample_list = []
-    lamp_sample_list = []
-    measurement_pos = []
-    measurement_result = []
-    lamp_correction = []
+    sample_list_photo = []      # for block reads of ADC
+    sample_list_diode = []      # for block reads of ADC
+    measurement_pos = []        # seconds or nm of the measure
+    measurement_photo = []      # the result integrated of the PM
+    measurement_diode = []      # the result integrate of diode
     last_measure = -1
 
 
     #dummy values
-    measure_time = 1/samples_per_second
+    # measure_time = 1/samples_per_second
 
     #setup ADC
     # Data collection setup
-    RATE = samples_per_second
+    #RATE = samples_per_second
 
-    # Create the I2C bus with a fast frequency
-    i2c = busio.I2C(board.SCL, board.SDA, frequency=1000000)
-
-    # Create the ADC object using the I2C bus and the correct gain:
-    # gain=8 for .500 ~ v aprox
-    ads = ADS.ADS1115(i2c, 8)
+    
     # Create single-ended input on channel 0 and 1
-    chan0 = AnalogIn(ads, ADS.P0)
-    chan1 = AnalogIn(ads, ADS.P1)
-
-    # ADC Configuration
-    ads.mode = Mode.CONTINUOUS
-    ads.data_rate = RATE
+    adc_photo = MCP3208(channel=0)
+    adc_diode = MCP3208(channel=1)
 
     #setup GUI
     if type_kinectics is False:
@@ -155,48 +147,65 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
 
     # Ready to start experiment
     sg.PopupOK('Press \'OK\' to start.', title='Ready to go', non_blocking=False)
-
-    start_exp_time = time.monotonic()
-    lap_time = start_exp_time - seconds_step
+    
+    # used for kinectics experiment
+    rest_flag = False
+    start_exp_time = time.monotonic()        
+    currend_integration_time = 0           
+    lap_time = start_exp_time
+    
+    time_spent_on_adc = 0.50
+    # WINDOW MAIN LOOP
     while True:
         event, values = window.read(timeout=10)
         currend_time = time.monotonic()
-
+        
+        if type_kinectics is True and currend_time - lap_time >= seconds_step:
+            '''Rest time is over, we need to start the ADC reads.'''
+            rest_flag = False
+            
         if event == 'Pause':
             event, values = window.read()
         if event == 'Quit' or None:
-            break
+            answer = sg.PopupYesNo('Are you sure you want to quit?')
+            if answer=='Yes':
+                return None
 
-        #measure from adc
-        if type_kinectics is False or currend_time - lap_time >= seconds_step:
-            sample_list.append(chan0.value)
-            lamp_sample_list.append(chan1.value)
-            if len(sample_list) == samples_per_measurement: #took all measurements in the set
-                # print((nm_pos, sum(sample_list)/len(sample_list)))
+        if rest_flag is False:
+            '''No rest! Read ADC!'''
+            sample_list_photo.append(None)
+            sample_list_diode.append(None)
+            sample_list_photo, sample_list_diode = _timed_measure(adc_photo, adc_diode, time_spent_on_adc)
+            currend_integration_time += time_spent_on_adc
+            
+            if currend_integration_time >= time_step:
+                '''integrated the right amount of time.'''
+                rest_flag = True
+                measurement_photo.append(_mean_list(sample_list_photo))
+                measurement_diode.append(_mean_list(sample_list_diode))
+                last_measure = measure_photo[-1]
                 if type_kinectics is False:
                     measurement_pos.append(nm_pos)
+                    rest_flag = False
                 else:
                     measurement_pos.append(currend_time - start_exp_time)
-                last_measure = sum(sample_list)/len(sample_list)
-                lamp_last_measure = sum(lamp_sample_list)/len(lamp_sample_list)
-                measurement_result.append(last_measure)
-                lamp_correction.append(lamp_last_measure)
-                lap_time = currend_time
-
+                    lap_time = time.monotonic()
+                
                 #draw a line between the last two measurements
                 #if there's at least two elements in the measurement
                 if len(measurement_pos) > 1:
-                    graph.DrawLine((measurement_pos[-1], measurement_result[-1]), (measurement_pos[-2], measurement_result[-2]))
+                    graph.DrawLine((measurement_pos[-1], measurement_photo[-1]), 
+                                   (measurement_pos[-2], measurement_photo[-2]))
 
-                sample_list = []
-                lamp_sample_list = []
+                sample_list_photo, sample_list_diode = [], []
+                
                 if type_kinectics is False and nm_pos < nm_stop:
                     #move stepper, but don't want to overshoot
-                    nm_pos += nm_step
                     wave_step(nm_step, pin_list)
+                    nm_pos += nm_step
 
-            if (type_kinectics is False and nm_pos > nm_stop or
-             type_kinectics is True and currend_time - start_exp_time > reaction_time): 
+            if (type_kinectics is False and nm_pos >= nm_stop or
+                type_kinectics is True and currend_time - start_exp_time > reaction_time): 
                 #the experiment has ended
                 sg.PopupOK('End of the measures.\n REMEBER TO SAVE .CSV')
                 break
@@ -205,19 +214,18 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             window.Element('text.nm').update(str(nm_pos))
             window.Element('text_sample').update(str(len(sample_list)))
             window.Element('last_measure').update(str(int(last_measure)))
-            stopTime = time.monotonic()
             # print(startTime - stopTime)
             # print(startADCTime - startTime)
             # print('\n\n')
-
+            
     # Update buttons states
     window.Element('btn_csv').update(disabled=False)
     window.Element('btn_plot').update(disabled=False)
     window.Element('Pause').update(disabled=True)
 
-    np_array_pos = np.array(measurement_pos)         # for matplotlib
-    np_array_results = np.array(measurement_result)  # for matplotlib
-    np_array_lamp = np.array(lamp_correction)
+    np_array_pos = np.array(measurement_pos)        # for matplotlib
+    np_array_results = np.array(measurement_photo)  # for matplotlib
+    np_array_lamp = np.array(measurement_diode)     # for matplotlib
 
     while True:
         event, values = window.read()
@@ -236,14 +244,14 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
                 sg.PopupOK('Empty name or you canceled the save operation.\nNOT RECOMENDED.')
             file.write('Wavelenght, measured value, lamp value')
             for i in range (0, len(measurement_pos)):
-                file.write(str(measurement_pos[i]) + ',' + str(measurement_result[i]) + '\n')
+                file.write(str(measurement_pos[i]) + ',' + str(measurement_photo[i]) + '\n')
             file.close()
         if event=='btn_plot':
-            plt.plot(measurement_pos, measurement_result) # figure with plot
+            plt.plot(measurement_pos, measurement_photo) # figure with plot
             plt.xlabel('nm')
             plt.ylabel('signal')
             plt.title('Measurements Results')
             plt.show(block=False)
     plt.close()
     window.close()
-    return measurement_pos, measurement_result
+    return measurement_pos, measurement_photo

@@ -11,7 +11,7 @@ para raspy
 # clock_pin=11, mosi_pin=10, miso_pin=9, select_pin=8
 
 from gpiozero import MCP3208
-from time import sleep
+import time
 
 SAMPLES = 1000
 
@@ -28,8 +28,8 @@ for i in range(SAMPLES):
     data_diode[i] = adc_diode.value
 end = time.monotonic()
 total_time = end - start
-for i in range (0, len(data_photo):
-    print('{}, {}\n'.format(data_photo[i], data_diode[i])))
+for i in range (0, len(data_photo)):
+    print('{}, {}\n'.format(data_photo[i], data_diode[i]))
 print("Time of capture: {}s".format(total_time))
 print("Actual sample rate={}".format(2*SAMPLES / total_time))
 
