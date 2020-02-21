@@ -1,12 +1,6 @@
 import PySimpleGUI as sg
 import time
 from math import floor
-from Hardware.StepControler import wave_step
-import board
-import busio
-import adafruit_ads1x15.ads1115 as ADS
-from adafruit_ads1x15.ads1x15 import Mode
-from adafruit_ads1x15.analog_in import AnalogIn
 
 import random as rnd      #for test purposes ONLY
 
@@ -14,6 +8,43 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 sg.ChangeLookAndFeel('DarkBlue')
+
+def _mean_list(list):
+    return sum(list)/len(list)
+
+
+def sample_measure(adc_photo, adc_diode, SAMPLES=5000):
+    '''.return the mean value of SAMPLES measures of the mcp3208.'''
+    measure_photo = [None]*SAMPLES
+    measure_diode = [None]*SAMPLES
+    start = time.monotonic()
+    for i in range (0, SAMPLES):
+        measure_photo[i] = adc_photo.value
+        measure_diode[i] = adc_diode.value
+    currend = time.monotonic()
+    mean_photo = _mean_list(measure_photo)
+    mean_diode = _mean_list(measure_diode)
+    elapsed_time = currend - start
+    return mean_photo, mean_diode, elapsed_time
+
+def timed_measure(adc_photo, adc_diode, time, SAMPLES=100):
+    '''return mean value of as many measures can be made in 'time' seconds.'''
+    measure_photo = [None]*SAMPLES
+    measure_diode = [None]*SAMPLES
+    mean_photo = []
+    mean_diode = []
+    start = time.monotonic()
+    currend = start
+    correction = 0.0                    # we compensate the list managing time
+    while currend - correction - start < time:
+        for i in range (0, SAMPLES):
+            measure_photo[i] = adc_photo.value
+            measure_diode[i] = adc_diode.value
+        currend = time.monotonic()
+        mean_photo.append(_mean_list(measure_photo))
+        mean_diode.append(_mean_list(measure_diode))
+        correction += time.monotonic() - currend
+    return _mean_list(mean_photo), _mean_list(mean_photo)
 
 def measure(values, pin_list_ex, pin_list_em, work_path):
     loading_popup = sg.Popup('Moving to start position. Please wait...',
@@ -35,7 +66,6 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
         reaction_time=0
         seconds_step=0
         type_kinectics = False
-
     else:
         type_kinectics = True
         reaction_time = values['input_ti']
@@ -52,7 +82,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
 
     nm_step = values['input_in_nm']
     time_step = values['integration_time']
-    samples_per_second = 32
+    samples_per_second = 30000
     samples_per_measurement = floor(samples_per_second*time_step)
 
     #process calculation valrables and lists
