@@ -52,23 +52,30 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
                              non_blocking=True, auto_close=True, auto_close_duration=1)
     #varables from setup
     if values['radio_ex']:
+        type_label = 'excitation'
         nm_start = values['input_ex_st']
         nm_stop = values['input_ex_en']
+        nm_fixed = values['input_em_st']
         pin_list = pin_list_ex
         nm_pos = nm_start
         reaction_time = 0
         seconds_step=0
         type_kinectics = False
     elif values['radio_em']:
+        type_label = 'emition'
         nm_start = values['input_em_st']
         nm_stop = values['input_em_en']
+        nm_fixed = values['input_ex_st']
         pin_list = pin_list_em
         nm_pos = nm_start
         reaction_time=0
         seconds_step=0
         type_kinectics = False
     else:
+        type_label = 'kinectics'
         type_kinectics = True
+        nm_ex_fixed = values['input_ex_st']
+        nm_em_fixed = values['input_em_st']
         reaction_time = values['input_ti']  # total experiment time
         seconds_step = values['input_in_s'] # rest time between measures
         
@@ -82,9 +89,9 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
     wave_step(values['input_em_st'] - values['nm_pos_em'], pin_list_em)
 
     nm_step = values['input_in_nm']             # step size between measures
-    time_step = values['integration_time']
+    integration_time = values['integration_time']
     # samples_per_second = 30000
-    # samples_per_measurement = floor(samples_per_second*time_step)
+    # samples_per_measurement = floor(samples_per_second*integration_time)
 
     #process calculation valrables and lists
     sample_list_photo = []      # for block reads of ADC
@@ -178,7 +185,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             sample_list_photo, sample_list_diode = _timed_measure(adc_photo, adc_diode, time_spent_on_adc)
             currend_integration_time += time_spent_on_adc
             
-            if currend_integration_time >= time_step:
+            if currend_integration_time >= integration_time:
                 '''integrated the right amount of time.'''
                 rest_flag = True
                 measurement_photo.append(_mean_list(sample_list_photo))
