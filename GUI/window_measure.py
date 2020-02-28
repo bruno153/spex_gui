@@ -45,7 +45,7 @@ def _save(values):
 def _mean_list(list):
     return sum(list)/len(list)
 
-def _sample_measure(adc_photo, adc_diode, SAMPLES=100):
+def _sample_measure(adc_photo, adc_diode, SAMPLES=300):
     '''.return the mean value of SAMPLES measures of the mcp3208.'''
     measure_photo = [None]*SAMPLES
     measure_diode = [None]*SAMPLES
