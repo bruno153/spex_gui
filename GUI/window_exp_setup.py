@@ -7,6 +7,9 @@ sg.ChangeLookAndFeel('DarkBlue')
     
 
 def exp_setup(work_path):
+    values['blank_file'] = ''
+    values['correction_file'] = ''
+    
     sg.SetOptions(text_justification='left')
     layout = [
         [sg.Text('Experiment', size=(20,1)), 
@@ -41,7 +44,11 @@ def exp_setup(work_path):
                                                                 # key='measure')],
         [sg.Text('_'*60)],
         [sg.Button('Save setup...', key='save_setup'), 
-            sg.Button('Open setup...', key='open_setup')],
+            sg.Button('Open setup...', key='open_setup')], 
+        [sg.Button('Select blank subtraction file...', key='blank_file'), 
+            sg.Text(size=(40,1), key='blank_text')],
+        [sg.Button('Select correction file...', key='correction_file'), 
+            sg.Text(size=(40,1), key='correct_text')],
         [sg.Button('Submit', size=(20,1), button_color=('black','green')), 
             sg.Quit(size=(10,1), button_color=('black','red'))]
     ]
@@ -135,7 +142,19 @@ def exp_setup(work_path):
              #-----------------END OF UPDATES-----------------------------       
             
             file.close()
-            
+        
+        if event=='blank_file':
+            blank_file=''
+            blank_file = sg.PopupGetFile('Select the blank subtraction file.')
+            window.Element('blank_text').Update(blank_file)
+            values['blank_file'] = blank_file
+        
+        if event=='correction_file':
+            correction_file=''
+            correction_file = sg.PopupGetFile('Select the photomultiplier correction file.')
+            window.Element('correct_text').Update(correction_file)
+            values['correction_file'] = correction_file
+        
         if event in (None, 'Quit'):
             window.close()
             return None

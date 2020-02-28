@@ -15,6 +15,77 @@ import numpy as np
 
 sg.ChangeLookAndFeel('DarkBlue')
 
+<<<<<<< Updated upstream
+=======
+def _save(values):
+    save_csv_path = sg.PopupGetFile('Save experiment results as..',
+                                    save_as=True,
+                                    file_types= (('save files', '.csv'),),)
+    try:
+        file = open((save_csv_path), 'w')
+        file.write('# Blank subtraction file: '+ values['blank_sub_file'] +'\n')
+        file.write('# Correction factor file: '+ values['correction_file'] +'\n#\n')
+        file.write('# Experiment type: '+ type_label +'\n')
+        if type_kinectics is False:
+            file.write('# Start: '+ str(nm_start)+ ' nm, End: '+ str(nm_stop)+' nm\n')
+            file.write('# Increment: '+ str(nm_step)+ ' nm,')
+            file.write(' Integration Time: '+str(integration_time)+' seconds\n')
+            file.write('#' + '_'*100+'\n')
+            file.write('# Wavelenght (nm), measured value\n')
+        else:
+            file.write('# Total reaction time: ' + str(reaction_time) + ' seconds,')
+            file.write(' Step time: '+ str(seconds_step) +' seconds\n')
+            file.write('# Excitation value: ' +str(nm_ex_fixed) + ' nm, ')
+            file.write('Emition value: '+ str(nm_em_fixed)+ ' nm\n')
+            file.write('#' + '_'*60+'\n')
+            file.write('# Time (seconds), measured value\n')
+            
+        for i in range (0, len(measurement_pos)):
+            file.write(str(measurement_pos[i]) + ', ' + str(measurement_photo[i]) + '\n')
+        file.write('#' + '_'*60+'\n')
+        file.close()
+    except:
+        sg.PopupOK('Empty name or you canceled the save operation.\nNOT RECOMENDED.')
+        raise
+
+def _mean_list(list):
+    return sum(list)/len(list)
+
+
+def _sample_measure(adc_photo, adc_diode, SAMPLES=5000):
+    '''.return the mean value of SAMPLES measures of the mcp3208.'''
+    measure_photo = [None]*SAMPLES
+    measure_diode = [None]*SAMPLES
+    start = time.monotonic()
+    for i in range (0, SAMPLES):
+        measure_photo[i] = adc_photo.value
+        measure_diode[i] = adc_diode.value
+    currend = time.monotonic()
+    mean_photo = _mean_list(measure_photo)
+    mean_diode = _mean_list(measure_diode)
+    elapsed_time = currend - start
+    return mean_photo, mean_diode, elapsed_time
+
+def _timed_measure(adc_photo, adc_diode, time, SAMPLES=1000):
+    '''return mean value of as many measures can be made in 'time' seconds.'''
+    measure_photo = [None]*SAMPLES
+    measure_diode = [None]*SAMPLES
+    mean_photo = []
+    mean_diode = []
+    start = time.monotonic()
+    currend = start
+    correction = 0.0                    # we compensate the list managing time
+    while currend - correction - start < time:
+        for i in range (0, SAMPLES):
+            measure_photo[i] = adc_photo.value
+            measure_diode[i] = adc_diode.value
+        currend = time.monotonic()
+        mean_photo.append(_mean_list(measure_photo))
+        mean_diode.append(_mean_list(measure_diode))
+        correction += time.monotonic() - currend
+    return _mean_list(mean_photo), _mean_list(mean_photo)
+
+>>>>>>> Stashed changes
 def measure(values, pin_list_ex, pin_list_em, work_path):
     loading_popup = sg.Popup('Moving to start position. Please wait...',
                              non_blocking=True, auto_close=True, auto_close_duration=1)
@@ -192,6 +263,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             break
 
         if event=='btn_csv':
+<<<<<<< Updated upstream
             save_csv_path = sg.PopupGetFile('Save experiment results as..',
                                             initial_folder=str(work_path),
                                             save_as=True,
@@ -203,6 +275,21 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             for i in range (0, len(measurement_pos)):
                 file.write(str(measurement_pos[i]) + ',' + str(measurement_result[i]) + '\n')
             file.close()
+=======
+            # save_csv_path = sg.PopupGetFile('Save experiment results as..',
+                                            # initial_folder=str(work_path),
+                                            # save_as=True,
+                                            # file_types= (('save files', '.csv'),),)
+            # try:
+                # file = open((save_csv_path), 'w')
+            # except:
+                # sg.PopupOK('Empty name or you canceled the save operation.\nNOT RECOMENDED.')
+            # file.write('Wavelenght, measured value, lamp value')
+            # for i in range (0, len(measurement_pos)):
+                # file.write(str(measurement_pos[i]) + ',' + str(measurement_photo[i]) + '\n')
+            # file.close()
+            _save(values)
+>>>>>>> Stashed changes
         if event=='btn_plot':
             plt.plot(measurement_pos, measurement_result) # figure with plot
             plt.xlabel('nm')
