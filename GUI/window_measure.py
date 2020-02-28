@@ -4,8 +4,8 @@ from math import floor
 from gpiozero import MCP3208
 from Hardware.StepControler import wave_step
 
-import matplotlib.pyplot as plt
-import numpy as np
+# import matplotlib.pyplot as plt
+# import numpy as np
 
 import random as rnd        # for test purposes ONLY
 
@@ -194,7 +194,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
     currend_integration_time = 0           
     lap_time = start_exp_time
     
-    time_spent_on_adc = 0.50
+    time_spent_on_adc = 0.1
     # WINDOW MAIN LOOP
     while True:
         event, values = window.read(timeout=10)
@@ -221,6 +221,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             if currend_integration_time >= integration_time:
                 '''integrated the right amount of time.'''
                 rest_flag = True
+                currend_integration_time=0
                 measurement_photo.append(_mean_list(sample_list_photo))
                 measurement_diode.append(_mean_list(sample_list_diode))
                 last_measure = measurement_photo[-1]
