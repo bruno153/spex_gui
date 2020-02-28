@@ -2,6 +2,7 @@ import PySimpleGUI as sg
 import time
 from math import floor
 from gpiozero import MCP3208
+from Hardware.StepControler import wave_step
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,7 +15,7 @@ def _mean_list(list):
     return sum(list)/len(list)
 
 
-def _sample_measure(adc_photo, adc_diode, SAMPLES=5000):
+def _sample_measure(adc_photo, adc_diode, SAMPLES=100):
     '''.return the mean value of SAMPLES measures of the mcp3208.'''
     measure_photo = [None]*SAMPLES
     measure_diode = [None]*SAMPLES
@@ -26,10 +27,10 @@ def _sample_measure(adc_photo, adc_diode, SAMPLES=5000):
     mean_photo = _mean_list(measure_photo)
     mean_diode = _mean_list(measure_diode)
     elapsed_time = currend - start
-    return mean_photo, mean_diode, elapsed_time
+    return mean_photo*10000, mean_diode*10000, elapsed_time
 
-def _timed_measure(adc_photo, adc_diode, time, SAMPLES=1000):
-    '''return mean value of as many measures can be made in 'time' seconds.'''
+def _timed_measure(adc_photo, adc_diode, time_, SAMPLES=100):
+    '''return mean value of as many measures can be made in 'time_' seconds.'''
     measure_photo = [None]*SAMPLES
     measure_diode = [None]*SAMPLES
     mean_photo = []
@@ -37,7 +38,7 @@ def _timed_measure(adc_photo, adc_diode, time, SAMPLES=1000):
     start = time.monotonic()
     currend = start
     correction = 0.0                    # we compensate the list managing time
-    while currend - correction - start < time:
+    while currend - correction - start < time_:
         for i in range (0, SAMPLES):
             measure_photo[i] = adc_photo.value
             measure_diode[i] = adc_diode.value
@@ -45,7 +46,7 @@ def _timed_measure(adc_photo, adc_diode, time, SAMPLES=1000):
         mean_photo.append(_mean_list(measure_photo))
         mean_diode.append(_mean_list(measure_diode))
         correction += time.monotonic() - currend
-    return _mean_list(mean_photo), _mean_list(mean_photo)
+    return _mean_list(mean_photo)*10000, _mean_list(mean_diode)*10000
 
 def measure(values, pin_list_ex, pin_list_em, work_path):
     loading_popup = sg.Popup('Moving to start position. Please wait...',
@@ -129,10 +130,10 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
         [sg.Text('Last measure: '),
             sg.Text('', justification='right', size=(8,1), key='last_measure')],
         [sg.Text('Sample number: '),
-            sg.Text(str(len(sample_list)), size=(2, 1), key='text_sample')],
+            sg.Text(str(len(sample_list_photo)), size=(2, 1), key='text_sample')],
         [sg.Graph(canvas_size=(600, 300), 
                   graph_bottom_left=(graph_label_start - 5,-30), # compensate for borders
-                  graph_top_right=(graph_label_stop + 5,32000),  # compensate for borders
+                  graph_top_right=(graph_label_stop + 5,10010),  # compensate for borders
                   background_color='white', key='graph')],
         [sg.Button('Export csv...', disabled=True, key='btn_csv'),
             sg.Button('Show plot', disabled=True, key='btn_plot')],
@@ -182,7 +183,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             '''No rest! Read ADC!'''
             sample_list_photo.append(None)
             sample_list_diode.append(None)
-            sample_list_photo, sample_list_diode = _timed_measure(adc_photo, adc_diode, time_spent_on_adc)
+            sample_list_photo[-1], sample_list_diode[-1] = _timed_measure(adc_photo, adc_diode, time_spent_on_adc)
             currend_integration_time += time_spent_on_adc
             
             if currend_integration_time >= integration_time:
@@ -190,7 +191,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
                 rest_flag = True
                 measurement_photo.append(_mean_list(sample_list_photo))
                 measurement_diode.append(_mean_list(sample_list_diode))
-                last_measure = measure_photo[-1]
+                last_measure = measurement_photo[-1]
                 if type_kinectics is False:
                     measurement_pos.append(nm_pos)
                     rest_flag = False
@@ -219,7 +220,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             
             #update window
             window.Element('text.nm').update(str(nm_pos))
-            window.Element('text_sample').update(str(len(sample_list)))
+            window.Element('text_sample').update(str(len(sample_list_photo)))
             window.Element('last_measure').update(str(int(last_measure)))
             # print(startTime - stopTime)
             # print(startADCTime - startTime)

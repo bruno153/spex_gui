@@ -18,8 +18,8 @@ from GUI.window_splash import splash
 # Pin setup
 pin_list_em = {}
 
-pin_list_em['stepPin'] = io.DigitalOutputDevice(25)
-pin_list_em['dirPin'] = io.DigitalOutputDevice(8)
+pin_list_em['stepPin'] = io.DigitalOutputDevice(16)
+pin_list_em['dirPin'] = io.DigitalOutputDevice(12)
 pin_list_em['stepInterval'] = .005 # milliseconds
 pin_list_em['stopPin1'] = io.DigitalInputDevice(7, pull_up=True) # positivo
 pin_list_em['stopPin2'] = io.DigitalInputDevice(1, pull_up=True) # negativo
