@@ -37,7 +37,8 @@ def login():
                     sg.InputText(focus=True)],
                 [sg.Cancel(), sg.Submit()]
             ]
-
+            
+            # Popup for new user
             window2 = sg.Window('NewUser', layout_newuser)
             event2, values2 = window2.read()
             window2.close()
@@ -47,7 +48,7 @@ def login():
             # values2[0]== string colocada no InputText
             elif len(values2[0]) == 0 or values2[0] in userlist:
                 if len(values2[0]) == 0:
-                    sg.PopupOK('Coloca nome direito caralho.')
+                    sg.PopupOK('Empty name is not alowed')
                 if values2[0] in userlist:
                     sg.PopupOK('The \'no clone theorem\' is aplied here.\nTry a different username')
             else:

@@ -1,40 +1,36 @@
 # -*- coding: utf-8 -*-
 # import sys
 # sys.path.append('../')
+
 import PySimpleGUI as sg
 from Hardware.DeclarativeStepControler import wave_step
-import board
-import busio
-import adafruit_ads1x15.ads1115 as ADS
-from adafruit_ads1x15.ads1x15 import Mode
-from adafruit_ads1x15.analog_in import AnalogIn
+from gpiozero import MCP3208
+import time
+# Create input on channel 0 of MCP3208
+adc_photo = MCP3208(channel=0)
 
-# Data collection setup
-RATE = 64
-
-# Create the I2C bus
-# Set frequency high to reduce time spent with I2C comms
-i2c = busio.I2C(board.SCL, board.SDA, frequency=1000000)
-
-# Create the ADC object using the I2C bus
-ads = ADS.ADS1115(i2c, 8)
-
-# Create single-ended input on channel 0
-chan0 = AnalogIn(ads, ADS.P0)
-chan1 = AnalogIn(ads, ADS.P1)
-
-# ADC Configuration
-ads.mode = Mode.CONTINUOUS
-ads.data_rate = RATE
-
+# start of GUI design
 sg.ChangeLookAndFeel('DarkBlue')
 
+def _mean_list(list):
+    return sum(list)/len(list)
+
+def sample_measure(adc_photo, SAMPLES=1000):
+    '''.return the mean value of SAMPLES measures of the mcp3208.'''
+    measure_photo = [None]*SAMPLES
+    start = time.monotonic()
+    for i in range (0, SAMPLES):
+        measure_photo[i] = adc_photo.value
+    currend = time.monotonic()
+    mean_photo = _mean_list(measure_photo)
+    elapsed_time = currend - start
+    return mean_photo, elapsed_time
+
 def manual_control(pin_list_ex, pin_list_em):
-    
-    # Defaut values
+    # Defaut mono values
     ex_val = 4000
     em_val = 3000
-
+    RATE = 100
     sg.SetOptions(text_justification='left')
     layout_manualControl = [
         [sg.Text('Manual Control', font=('Helvetica', 16))],
@@ -58,7 +54,7 @@ def manual_control(pin_list_ex, pin_list_em):
         [sg.Text('Measure: ', size=(22, 1)), 
             sg.Text('0', size=(7,1), justification='right', key='measure')],
         [sg.Graph(canvas_size=(460, 270), graph_bottom_left=(0,0), 
-                  graph_top_right=(3*RATE, 32767), background_color='white', key='graph')],
+                  graph_top_right=(3*RATE, 1), background_color='white', key='graph')],
         [sg.Submit(), sg.Quit()]
 
     ]
@@ -126,15 +122,13 @@ def manual_control(pin_list_ex, pin_list_em):
         graph.Erase()
         if i >= 3*RATE:
             i = 0
-        data1 = chan1.value
-        data = chan0.value
+        data = sample_measure(adc_photo)[0]
         points[i] = (i, data)
         for j in range (0, 3*RATE):
             graph.DrawPoint((points[j]), 1, color='green')
-        window_manualControl['measure'].Update('{0:.1f}'.format(data))
+        window_manualControl['measure'].Update('{0:.4f}'.format(data))
         i = i + 1
         
     dic = {'nm_pos_ex': ex_val/10, 'nm_pos_em': em_val/10}
     window_manualControl.close()
     return dic
-    

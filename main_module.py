@@ -2,7 +2,9 @@
 import PySimpleGUI as sg
 import pickle as p
 import gpiozero as io
-#from time import sleep
+# from gpiozero.pins.mock import MockFactory
+# io.Device.pin_factory = MockFactory()
+# from time import sleep
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,14 +15,11 @@ from GUI.window_login import login
 from GUI.window_manual_control import manual_control
 from GUI.window_splash import splash
 
-#from gpiozero.pins.mock import MockFactory
-#io.Device.pin_factory = MockFactory()
-
 # Pin setup
 pin_list_em = {}
 
-pin_list_em['stepPin'] = io.DigitalOutputDevice(25)
-pin_list_em['dirPin'] = io.DigitalOutputDevice(8)
+pin_list_em['stepPin'] = io.DigitalOutputDevice(16)
+pin_list_em['dirPin'] = io.DigitalOutputDevice(12)
 pin_list_em['stepInterval'] = .005 # milliseconds
 pin_list_em['stopPin1'] = io.DigitalInputDevice(7, pull_up=True) # positivo
 pin_list_em['stopPin2'] = io.DigitalInputDevice(1, pull_up=True) # negativo
