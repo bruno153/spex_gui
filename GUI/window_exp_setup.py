@@ -7,6 +7,7 @@ sg.ChangeLookAndFeel('DarkBlue')
     
 
 def exp_setup(work_path):
+    values = {}
     values['blank_file'] = ''
     values['correction_file'] = ''
     
@@ -86,17 +87,20 @@ def exp_setup(work_path):
             # manual_control()
         
         if event=='save_setup':
-            # save the experiment setup to the file
-            save_path = sg.PopupGetFile('Save experiment setup as..', 
-                                        initial_folder=str(work_path),
-                                        save_as=True, 
-                                        file_types= (('setup files', '.txt'),),)
-            file = open(save_path, 'w')
-            for key in values.keys():
-                if values[key] is '':
-                    values[key]=-1
-                file.write(key + '=' + str(values[key]) + '\n')
-            file.close()
+            try:
+                # save the experiment setup to the file
+                save_path = sg.PopupGetFile('Save experiment setup as..', 
+                                            initial_folder=str(work_path),
+                                            save_as=True, 
+                                            file_types= (('setup files', '.txt'),),)
+                file = open(save_path, 'w')
+                for key in values.keys():
+                    if values[key] is '':
+                        values[key]=-1
+                    file.write(key + '=' + str(values[key]) + '\n')
+                file.close()
+            except:
+                sg.PopupOK('Ou você não selecionou direito o caminho para salvar, ou algo deu errado.\n Sempre clique em browse para salvar.')
             
         if event=='open_setup':
             # open an experiment and fill the values

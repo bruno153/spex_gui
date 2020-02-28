@@ -15,7 +15,7 @@ sg.ChangeLookAndFeel('DarkBlue')
 def _mean_list(list):
     return sum(list)/len(list)
 
-def sample_measure(adc_photo, SAMPLES=1000):
+def sample_measure(adc_photo, SAMPLES=500):
     '''.return the mean value of SAMPLES measures of the mcp3208.'''
     measure_photo = [None]*SAMPLES
     start = time.monotonic()
@@ -54,12 +54,12 @@ def manual_control(pin_list_ex, pin_list_em):
         [sg.Text('Measure: ', size=(22, 1)), 
             sg.Text('0', size=(7,1), justification='right', key='measure')],
         [sg.Graph(canvas_size=(460, 270), graph_bottom_left=(0,0), 
-                  graph_top_right=(3*RATE, 1), background_color='white', key='graph')],
+                  graph_top_right=(3*RATE, 1.01), background_color='white', key='graph')],
         [sg.Submit(), sg.Quit()]
 
     ]
     i=0
-    points = [(i, 10) for i in range (0, 3*RATE)]
+    points = [(i, .01) for i in range (0, 3*RATE)]
     window_manualControl = sg.Window('SPEX control', layout_manualControl)
     window_manualControl.Finalize()
     graph = window_manualControl['graph']
@@ -122,11 +122,11 @@ def manual_control(pin_list_ex, pin_list_em):
         graph.Erase()
         if i >= 3*RATE:
             i = 0
-        data = sample_measure(adc_photo)[0]
+        data, measure_time = sample_measure(adc_photo)
         points[i] = (i, data)
         for j in range (0, 3*RATE):
-            graph.DrawPoint((points[j]), 1, color='green')
-        window_manualControl['measure'].Update('{0:.4f}'.format(data))
+            graph.DrawPoint((points[j]), .1, color='green')
+        window_manualControl['measure'].Update('{0:.4f}, '.format(data) + str(measure_time))
         i = i + 1
         
     dic = {'nm_pos_ex': ex_val/10, 'nm_pos_em': em_val/10}

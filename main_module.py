@@ -6,8 +6,8 @@ import gpiozero as io
 # io.Device.pin_factory = MockFactory()
 # from time import sleep
 
-import matplotlib.pyplot as plt
-import numpy as np
+# import matplotlib.pyplot as plt
+# import numpy as np
 
 from GUI.window_exp_setup import exp_setup
 from GUI.window_measure import measure
