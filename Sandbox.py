@@ -10,7 +10,7 @@ from math import floor
 from Hardware.StepControler import wave_step
 #for test purposes ONLY
 import random as rnd
-
+from datetime import datetime
 #pin setup
 io.Device.pin_factory = MockFactory()
 
@@ -36,6 +36,7 @@ pin_list['stepPin'].off()
 
 
 sg.ChangeLookAndFeel('DarkBlue')
+values = {}
 
 type_label = 'Kinetics'
 type_kinectics = True
@@ -47,25 +48,26 @@ reaction_time = 120
 seconds_step = 10
 nm_step = 5        # step size between measures
 integration_time = 3
-blank_sub_file = 'asdfsag.csv'
-correction_file = 'bbbbb.csv'
+values['blank_sub_file'] = 'asdfsag.blank'
+values['correction_file'] = 'bbbbb.corr'
 measurement_pos = [rnd.randint(0, 100)]*100
 measurement_photo = [rnd.randint(0, 100)]*100
 
-def _save():
+def _save(values):
     save_csv_path = sg.PopupGetFile('Save experiment results as..',
                                     save_as=True,
                                     file_types= (('save files', '.csv'),),)
     try:
         file = open((save_csv_path), 'w')
-        file.write('# Blank subtraction file: '+ blank_sub_file +'\n')
-        file.write('# Correction factor file: '+ correction_file +'\n#\n')
+        file.write('# Time stamp: ' + str(datetime.today())+ '\n')
+        file.write('# Blank subtraction file: '+ values['blank_sub_file'] +'\n')
+        file.write('# Correction factor file: '+ values['correction_file'] +'\n#\n')
         file.write('# Experiment type: '+ type_label +'\n')
         if type_kinectics is False:
             file.write('# Start: '+ str(nm_start)+ ' nm, End: '+ str(nm_stop)+' nm\n')
             file.write('# Increment: '+ str(nm_step)+ ' nm,')
             file.write(' Integration Time: '+str(integration_time)+' seconds\n')
-            file.write('#' + '_'*100+'\n')
+            file.write('#' + '_'*60+'\n')
             file.write('# Wavelenght (nm), measured value\n')
         else:
             file.write('# Total reaction time: ' + str(reaction_time) + ' seconds,')
@@ -77,9 +79,8 @@ def _save():
             
         for i in range (0, len(measurement_pos)):
             file.write(str(measurement_pos[i]) + ', ' + str(measurement_photo[i]) + '\n')
-        file.write('#' + '_'*60+'\n')
         file.close()
     except:
-        sg.PopupOK('Empty name or you canceled the save operation.\nNOT RECOMENDED.')
+        sg.PopupOK('Some error happened, wrong path, empty name or you canceled the save operation.\nNOT RECOMENDED.')
         raise
-_save()
+_save(values)

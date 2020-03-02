@@ -1,7 +1,12 @@
 import PySimpleGUI as sg
 import time
 from math import floor
-from gpiozero import MCP3208
+from datetime import datetime
+
+from mcp3208 import MCP3208
+'''we defaut the photomultiplier reads on chanel 0 and the photodiode reads 
+on channel 1'''
+
 from Hardware.StepControler import wave_step
 
 # import matplotlib.pyplot as plt
@@ -17,6 +22,7 @@ def _save(values):
                                     file_types= (('save files', '.csv'),),)
     try:
         file = open((save_csv_path), 'w')
+        file.write('# Time stamp: ' + str(datetime.today())+ '\n')
         file.write('# Blank subtraction file: '+ values['blank_sub_file'] +'\n')
         file.write('# Correction factor file: '+ values['correction_file'] +'\n#\n')
         file.write('# Experiment type: '+ type_label +'\n')
@@ -24,7 +30,7 @@ def _save(values):
             file.write('# Start: '+ str(nm_start)+ ' nm, End: '+ str(nm_stop)+' nm\n')
             file.write('# Increment: '+ str(nm_step)+ ' nm,')
             file.write(' Integration Time: '+str(integration_time)+' seconds\n')
-            file.write('#' + '_'*100+'\n')
+            file.write('#' + '_'*60+'\n')
             file.write('# Wavelenght (nm), measured value\n')
         else:
             file.write('# Total reaction time: ' + str(reaction_time) + ' seconds,')
@@ -36,31 +42,30 @@ def _save(values):
             
         for i in range (0, len(measurement_pos)):
             file.write(str(measurement_pos[i]) + ', ' + str(measurement_photo[i]) + '\n')
-        file.write('#' + '_'*60+'\n')
         file.close()
     except:
-        sg.PopupOK('Empty name or you canceled the save operation.\nNOT RECOMENDED.')
+        sg.PopupOK('Some error happened, wrong path, empty name or you canceled the save operation.\nNOT RECOMENDED.')
         raise
 
 def _mean_list(list):
     return sum(list)/len(list)
 
-def _sample_measure(adc_photo, adc_diode, SAMPLES=300):
-    '''.return the mean value of SAMPLES measures of the mcp3208.'''
+def _sample_measure(adc, SAMPLES=300):
+    '''return the mean value of SAMPLES measures of the mcp3208.'''
     measure_photo = [None]*SAMPLES
     measure_diode = [None]*SAMPLES
     start = time.monotonic()
     for i in range (0, SAMPLES):
-        measure_photo[i] = adc_photo.value
-        measure_diode[i] = adc_diode.value
+        measure_photo[i] = adc.read(0)
+        measure_diode[i] = adc.read(1)
     currend = time.monotonic()
     mean_photo = _mean_list(measure_photo)
     mean_diode = _mean_list(measure_diode)
     elapsed_time = currend - start
 
-    return mean_photo*10000, mean_diode*10000, elapsed_time
+    return mean_photo, mean_diode, elapsed_time
 
-def _timed_measure(adc_photo, adc_diode, time_, SAMPLES=100):
+def _timed_measure(adc, time_, SAMPLES=100):
     '''return mean value of as many measures can be made in 'time_' seconds.'''
     measure_photo = [None]*SAMPLES
     measure_diode = [None]*SAMPLES
@@ -72,13 +77,13 @@ def _timed_measure(adc_photo, adc_diode, time_, SAMPLES=100):
 
     while currend - correction - start < time_:
         for i in range (0, SAMPLES):
-            measure_photo[i] = adc_photo.value
-            measure_diode[i] = adc_diode.value
+            measure_photo[i] = adc.read(0)
+            measure_diode[i] = adc.read(1)
         currend = time.monotonic()
         mean_photo.append(_mean_list(measure_photo))
         mean_diode.append(_mean_list(measure_diode))
         correction += time.monotonic() - currend
-    return _mean_list(mean_photo)*10000, _mean_list(mean_diode)*10000
+    return _mean_list(mean_photo), _mean_list(mean_diode)
 
 def measure(values, pin_list_ex, pin_list_em, work_path):
     loading_popup = sg.Popup('Moving to start position. Please wait...',
@@ -143,9 +148,8 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
     #RATE = samples_per_second
 
     
-    # Create single-ended input on channel 0 and 1
-    adc_photo = MCP3208(channel=0)
-    adc_diode = MCP3208(channel=1)
+    # Create the ADC object
+    adc = MCP3208()
 
     #setup GUI
     if type_kinectics is False:
@@ -165,7 +169,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             sg.Text(str(len(sample_list_photo)), size=(2, 1), key='text_sample')],
         [sg.Graph(canvas_size=(600, 300), 
                   graph_bottom_left=(graph_label_start - 5,-30), # compensate for borders
-                  graph_top_right=(graph_label_stop + 5,10010),  # compensate for borders
+                  graph_top_right=(graph_label_stop + 5,4060),  # compensate for borders
                   background_color='white', key='graph')],
         [sg.Button('Export csv...', disabled=True, key='btn_csv'),
             sg.Button('Show plot', disabled=True, key='btn_plot')],
@@ -215,7 +219,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             '''No rest! Read ADC!'''
             sample_list_photo.append(None)
             sample_list_diode.append(None)
-            sample_list_photo[-1], sample_list_diode[-1] = _timed_measure(adc_photo, adc_diode, time_spent_on_adc)
+            sample_list_photo[-1], sample_list_diode[-1] = _timed_measure(adc, time_spent_on_adc)
             currend_integration_time += time_spent_on_adc
             
             if currend_integration_time >= integration_time:

@@ -4,10 +4,10 @@
 
 import PySimpleGUI as sg
 from Hardware.DeclarativeStepControler import wave_step
-from gpiozero import MCP3208
+from mcp3208 import MCP3208
 import time
 # Create input on channel 0 of MCP3208
-adc_photo = MCP3208(channel=0)
+adc_photo = MCP3208()
 
 # start of GUI design
 sg.ChangeLookAndFeel('DarkBlue')
@@ -21,7 +21,7 @@ def sample_measure(adc_photo, SAMPLES=600):
     measure_photo = [None]*SAMPLES
     start = time.monotonic()
     for i in range (0, SAMPLES):
-        measure_photo[i] = adc_photo.value
+        measure_photo[i] = adc_photo.read(0)
     currend = time.monotonic()
     mean_photo = _mean_list(measure_photo)
     elapsed_time = currend - start
