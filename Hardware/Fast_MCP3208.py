@@ -18,6 +18,6 @@ end = time.monotonic()
 total_time = end - start
 # for i in range (0, len(data_photo)):
     # print('{}, {}\n'.format(data_photo[i], data_diode[i]))
-print("mean: {}, var: {}.", mean(data_photo), pvariance(data_photo))
+print("mean: {}, var: {}.".format(mean(data_photo), pvariance(data_photo)))
 print("Time of capture: {}s".format(total_time))
 print("Actual sample rate={}".format(2*SAMPLES / total_time))

@@ -9,21 +9,22 @@ on channel 1'''
 
 from Hardware.StepControler import wave_step
 
-# import matplotlib.pyplot as plt
-# import numpy as np
+import matplotlib.pyplot as plt
+import numpy as np
 
 import random as rnd        # for test purposes ONLY
 
 sg.ChangeLookAndFeel('DarkBlue')
 
-def _save(values):
+def _save(values, work_path):
     save_csv_path = sg.PopupGetFile('Save experiment results as..',
                                     save_as=True,
+                                    defaut_path=work_path,
                                     file_types= (('save files', '.csv'),),)
     try:
         file = open((save_csv_path), 'w')
         file.write('# Time stamp: ' + str(datetime.today())+ '\n')
-        file.write('# Blank subtraction file: '+ values['blank_sub_file'] +'\n')
+        file.write('# Blank subtraction file: '+ values['blank_file'] +'\n')
         file.write('# Correction factor file: '+ values['correction_file'] +'\n#\n')
         file.write('# Experiment type: '+ type_label +'\n')
         if type_kinectics is False:
@@ -279,31 +280,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             break
 
         if event=='btn_csv':
-            save_csv_path = sg.PopupGetFile('Save experiment results as..',
-                                            initial_folder=str(work_path),
-                                            save_as=True,
-                                            file_types= (('save files', '.csv'),),)
-            try:
-                file = open((save_csv_path), 'w')
-            except:
-                sg.PopupOK('Empty name or you canceled the save operation.\nNOT RECOMENDED.')
-            file.write('Wavelenght, measured value, lamp value')
-            for i in range (0, len(measurement_pos)):
-                file.write(str(measurement_pos[i]) + ',' + str(measurement_photo[i]) + '\n')
-            file.close()
-            # save_csv_path = sg.PopupGetFile('Save experiment results as..',
-                                            # initial_folder=str(work_path),
-                                            # save_as=True,
-                                            # file_types= (('save files', '.csv'),),)
-            # try:
-                # file = open((save_csv_path), 'w')
-            # except:
-                # sg.PopupOK('Empty name or you canceled the save operation.\nNOT RECOMENDED.')
-            # file.write('Wavelenght, measured value, lamp value')
-            # for i in range (0, len(measurement_pos)):
-                # file.write(str(measurement_pos[i]) + ',' + str(measurement_photo[i]) + '\n')
-            # file.close()
-            _save(values)
+            _save(values, work_path)
         if event=='btn_plot':
             plt.plot(measurement_pos, measurement_photo) # figure with plot
             plt.xlabel('nm')

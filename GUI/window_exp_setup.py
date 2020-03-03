@@ -6,11 +6,7 @@ from pathlib import Path
 sg.ChangeLookAndFeel('DarkBlue')
     
 
-def exp_setup(work_path):
-    values = {}
-    values['blank_file'] = ''
-    values['correction_file'] = ''
-    
+def exp_setup(work_path):    
     sg.SetOptions(text_justification='left')
     layout = [
         [sg.Text('Experiment', size=(20,1)), 
@@ -47,9 +43,9 @@ def exp_setup(work_path):
         [sg.Button('Save setup...', key='save_setup'), 
             sg.Button('Open setup...', key='open_setup')], 
         [sg.Button('Select blank subtraction file...', key='blank_file'), 
-            sg.Text(size=(40,1), key='blank_text')],
+            sg.Text('None', size=(40,1), key='blank_text')],
         [sg.Button('Select correction file...', key='correction_file'), 
-            sg.Text(size=(40,1), key='correct_text')],
+            sg.Text('None', size=(40,1), key='correct_text')],
         [sg.Button('Submit', size=(20,1), button_color=('black','green')), 
             sg.Quit(size=(10,1), button_color=('black','red'))]
     ]
@@ -163,6 +159,8 @@ def exp_setup(work_path):
             window.close()
             return None
         if event=='Submit':
+            values['correction_file'] = window.Element('correct_text')
+            values['blank_file'] = window.Element('blank_text')
             break
     
     for i in values:
