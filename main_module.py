@@ -48,7 +48,6 @@ pin_list_ex['stepPin'].off()
 user, work_path = login()
 if user == None:
     exit()
-print(user)
 
 #manual control window
 values_manual_control = manual_control(pin_list_ex, pin_list_em)

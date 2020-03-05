@@ -8,8 +8,8 @@ from mcp3208 import MCP3208
 import time
 from random import randint
 # Create input on channel 0 of MCP3208
-# adc_photo = MCP3208()
-adc_photo = []
+adc_photo = MCP3208()
+# adc_photo = []            #------------------Change to test on pc ------------
 # start of GUI design
 sg.ChangeLookAndFeel('DarkBlue')
 
@@ -22,8 +22,8 @@ def sample_measure(adc_photo, SAMPLES=180):
     measure_photo = [None]*SAMPLES
     start = time.monotonic()
     for i in range (0, SAMPLES):
-        # measure_photo[i] = adc_photo.read(0)
-        measure_photo[i] = randint(0, 4100)
+        measure_photo[i] = adc_photo.read(0)    #------------------Change to test on pc ------------
+        # measure_photo[i] = randint(0, 4100)
     currend = time.monotonic()
     mean_photo = _mean_list(measure_photo)
     elapsed_time = currend - start

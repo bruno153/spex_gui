@@ -1,6 +1,6 @@
 import PySimpleGUI as sg
 #from window_manual_control import manual_control
-
+import pickle as p
 from pathlib import Path
 
 sg.ChangeLookAndFeel('DarkBlue')
@@ -94,61 +94,53 @@ def exp_setup(work_path):
                 save_path = sg.PopupGetFile('Save experiment setup as..', 
                                             initial_folder=str(work_path),
                                             save_as=True, 
-                                            file_types= (('setup files', '.txt'),),)
-                file = open(save_path, 'w')
-                for key in values.keys():
-                    if values[key] is '':
-                        values[key]=-1
-                    file.write(key + '=' + str(values[key]) + '\n')
-                file.close()
+                                            file_types= (('setup files', '.setup'),),)
+                if save_path is None:
+                    continue
+                p.dump(values, open(save_path, 'wb'))
             except:
                 sg.PopupOK('Ou você não selecionou direito o caminho para salvar, ou algo deu errado.\n Sempre clique em browse para salvar.')
-            
-        if event=='open_setup':
-            # open an experiment and fill the values
-            open_path = sg.PopupGetFile('Open experiment setup.', 
-                                        initial_folder=str(work_path),
-                                        file_types= (('setup files', '.txt'),),)
-            file = open((open_path), 'r')
-            infos = file.readlines()
-            for line in infos:
-                line = line.rstrip('\n')
-                line = line.split('=')
-                if line[1]=='True':
-                    line[1] = True
-                elif line[1]=='False':
-                    line[1]=False
-                elif line[1]=='-1':
-                    line[1]=''
-                else:
-                    line[1]=int(float(line[1]))
-                window.Element(line[0]).Update(line[1])
-                values[line[0]]=line[1]
+                raise
                 
-            #-------------------UPDATING THE ELEMENTS VALUES----------
-            if values['radio_em']:
-                window.Element('input_ex_en').Update(disabled=True)
-                window.Element('input_em_en').Update(disabled=False)
-                window.Element('input_ti').Update(disabled=True)
-                window.Element('input_in_s').Update(disabled=True)
-                window.Element('input_in_nm').Update(disabled=False)
-            if values['radio_ex']:
-                window.Element('input_ex_en').Update(disabled=False)
-                window.Element('input_em_en').Update(disabled=True)
-                window.Element('input_ti').Update(disabled=True)
-                window.Element('input_in_s').Update(disabled=True)
-                window.Element('input_in_nm').Update(disabled=False)
-            if values['radio_ki']:
-                window.Element('input_ex_en').Update(disabled=True)
-                window.Element('input_em_en').Update(disabled=True)
-                window.Element('input_ti').Update(disabled=False)
-                window.Element('input_in_s').Update(disabled=False)
-                window.Element('input_in_nm').Update(disabled=True)        
-            window.Element('text.slider').Update(str(values['integration_time']/10)+' s')
-             #-----------------END OF UPDATES-----------------------------       
-            
-            file.close()
-        
+        if event=='open_setup':
+            try:
+                # open an experiment and fill the values
+                open_path = sg.PopupGetFile('Open experiment setup.', 
+                                            initial_folder=str(work_path),
+                                            file_types= (('setup files', '.setup'),),)
+                if open_path== None:
+                    continue
+                values = p.load(open(open_path,'rb'))                    
+                #-------------------UPDATING THE ELEMENTS VALUES----------
+                if values['radio_em']:
+                    window.Element('input_ex_en').Update(disabled=True)
+                    window.Element('input_em_en').Update(disabled=False)
+                    window.Element('input_ti').Update(disabled=True)
+                    window.Element('input_in_s').Update(disabled=True)
+                    window.Element('input_in_nm').Update(disabled=False)
+                if values['radio_ex']:
+                    window.Element('input_ex_en').Update(disabled=False)
+                    window.Element('input_em_en').Update(disabled=True)
+                    window.Element('input_ti').Update(disabled=True)
+                    window.Element('input_in_s').Update(disabled=True)
+                    window.Element('input_in_nm').Update(disabled=False)
+                if values['radio_ki']:
+                    window.Element('input_ex_en').Update(disabled=True)
+                    window.Element('input_em_en').Update(disabled=True)
+                    window.Element('input_ti').Update(disabled=False)
+                    window.Element('input_in_s').Update(disabled=False)
+                    window.Element('input_in_nm').Update(disabled=True) 
+                for key in values:
+                    window.Element(key).Update(values[key])
+                window.Element('text.slider').Update(str(values['integration_time']/10)+' s')
+                blank_file = values['blank_file']
+                correction_file = values['correction_file']
+                window.Element('blank_file').Update(values['blank_file'].name)
+                window.Element('correction_file').Update(values['correction_file'].name)
+                 #-----------------END OF UPDATES-----------------------------       
+            except:
+                sg.PopupOK('Erro de leitura, ou vc cancelou ou path inexistente ou bug inerente')
+                raise
         if event=='blank_file_btn':
             blank_file = Path(sg.PopupGetFile('Select the blank subtraction file.',
                                                 initial_folder=str(work_path)))

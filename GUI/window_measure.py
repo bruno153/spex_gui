@@ -26,10 +26,10 @@ def _sample_measure(adc, SAMPLES=300):
     measure_diode = [None]*SAMPLES
     start = time.monotonic()
     for i in range (0, SAMPLES):
-        # measure_photo[i] = adc.read(0)
-        # measure_diode[i] = adc.read(1)
-        measure_photo[i] = randint(0, 4100)
-        measure_diode[i] = randint(0, 4100)
+        measure_photo[i] = adc.read(0)
+        measure_diode[i] = adc.read(1)
+        # measure_photo[i] = randint(0, 4100)
+        # measure_diode[i] = randint(0, 4100)#------------------Change to test on pc ------------
         
     currend = time.monotonic()
     mean_photo = _mean_list(measure_photo)
@@ -50,10 +50,10 @@ def _timed_measure(adc, time_, SAMPLES=100):
 
     while currend - correction - start < time_:
         for i in range (0, SAMPLES):
-            # measure_photo[i] = adc.read(0)
-            # measure_diode[i] = adc.read(1)
-            measure_photo[i] = randint(0, 4100)
-            measure_diode[i] = randint(0, 4100)
+            measure_photo[i] = adc.read(0)
+            measure_diode[i] = adc.read(1)
+            # measure_photo[i] = randint(0, 4100)
+            # measure_diode[i] = randint(0, 4100) #------------------Change to test on pc ------------
         currend = time.monotonic()
         mean_photo.append(_mean_list(measure_photo))
         mean_diode.append(_mean_list(measure_diode))
@@ -61,8 +61,6 @@ def _timed_measure(adc, time_, SAMPLES=100):
     return _mean_list(mean_photo), _mean_list(mean_diode)
 
 def measure(values, pin_list_ex, pin_list_em, work_path):
-    loading_popup = sg.Popup('Moving to start position. Please wait...',
-                             non_blocking=True, auto_close=True, auto_close_duration=1)
     #varables from setup
     if values['radio_ex']:
         type_label = 'excitation'
@@ -94,9 +92,8 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
         
 
     #Going to initial position popup
-    loading_popup = sg.Popup('Movendo os monocromadores para as posições iniciais, aguarde.',
+    loading_popup = sg.Popup('Moving to start position. Please wait...',
                              non_blocking=True, auto_close=True, auto_close_duration=1)
-
     # moving the monocrom to start positions
     wave_step(values['input_ex_st'] - values['nm_pos_ex'], pin_list_ex)
     wave_step(values['input_em_st'] - values['nm_pos_em'], pin_list_em)
@@ -126,8 +123,8 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
 
     
     # Create the ADC object
-    # adc = MCP3208()
-    adc = []
+    adc = MCP3208()
+    # adc = []              #------------------Change to test on pc ------------
 
     #setup GUI
     if type_kinectics is False:
