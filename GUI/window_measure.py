@@ -2,6 +2,7 @@ import PySimpleGUI as sg
 import time
 from math import floor
 from datetime import datetime
+from random import randint
 
 from mcp3208 import MCP3208
 '''we defaut the photomultiplier reads on chanel 0 and the photodiode reads 
@@ -16,38 +17,6 @@ import random as rnd        # for test purposes ONLY
 
 sg.ChangeLookAndFeel('DarkBlue')
 
-def _save(values, work_path):
-    save_csv_path = sg.PopupGetFile('Save experiment results as..',
-                                    save_as=True,
-                                    defaut_path=work_path,
-                                    file_types= (('save files', '.csv'),),)
-    try:
-        file = open((save_csv_path), 'w')
-        file.write('# Time stamp: ' + str(datetime.today())+ '\n')
-        file.write('# Blank subtraction file: '+ values['blank_file'] +'\n')
-        file.write('# Correction factor file: '+ values['correction_file'] +'\n#\n')
-        file.write('# Experiment type: '+ type_label +'\n')
-        if type_kinectics is False:
-            file.write('# Start: '+ str(nm_start)+ ' nm, End: '+ str(nm_stop)+' nm\n')
-            file.write('# Increment: '+ str(nm_step)+ ' nm,')
-            file.write(' Integration Time: '+str(integration_time)+' seconds\n')
-            file.write('#' + '_'*60+'\n')
-            file.write('# Wavelenght (nm), measured value\n')
-        else:
-            file.write('# Total reaction time: ' + str(reaction_time) + ' seconds,')
-            file.write(' Step time: '+ str(seconds_step) +' seconds\n')
-            file.write('# Excitation value: ' +str(nm_ex_fixed) + ' nm, ')
-            file.write('Emition value: '+ str(nm_em_fixed)+ ' nm\n')
-            file.write('#' + '_'*60+'\n')
-            file.write('# Time (seconds), measured value\n')
-            
-        for i in range (0, len(measurement_pos)):
-            file.write(str(measurement_pos[i]) + ', ' + str(measurement_photo[i]) + '\n')
-        file.close()
-    except:
-        sg.PopupOK('Some error happened, wrong path, empty name or you canceled the save operation.\nNOT RECOMENDED.')
-        raise
-
 def _mean_list(list):
     return sum(list)/len(list)
 
@@ -57,8 +26,11 @@ def _sample_measure(adc, SAMPLES=300):
     measure_diode = [None]*SAMPLES
     start = time.monotonic()
     for i in range (0, SAMPLES):
-        measure_photo[i] = adc.read(0)
-        measure_diode[i] = adc.read(1)
+        # measure_photo[i] = adc.read(0)
+        # measure_diode[i] = adc.read(1)
+        measure_photo[i] = randint(0, 4100)
+        measure_diode[i] = randint(0, 4100)
+        
     currend = time.monotonic()
     mean_photo = _mean_list(measure_photo)
     mean_diode = _mean_list(measure_diode)
@@ -78,8 +50,10 @@ def _timed_measure(adc, time_, SAMPLES=100):
 
     while currend - correction - start < time_:
         for i in range (0, SAMPLES):
-            measure_photo[i] = adc.read(0)
-            measure_diode[i] = adc.read(1)
+            # measure_photo[i] = adc.read(0)
+            # measure_diode[i] = adc.read(1)
+            measure_photo[i] = randint(0, 4100)
+            measure_diode[i] = randint(0, 4100)
         currend = time.monotonic()
         mean_photo.append(_mean_list(measure_photo))
         mean_diode.append(_mean_list(measure_diode))
@@ -129,6 +103,8 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
 
     nm_step = values['input_in_nm']             # step size between measures
     integration_time = values['integration_time']
+    blank_file = values['blank_file']
+    correction_file = values['correction_file']
     # samples_per_second = 30000
     # samples_per_measurement = floor(samples_per_second*integration_time)
 
@@ -150,7 +126,8 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
 
     
     # Create the ADC object
-    adc = MCP3208()
+    # adc = MCP3208()
+    adc = []
 
     #setup GUI
     if type_kinectics is False:
@@ -202,7 +179,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
     time_spent_on_adc = 0.1
     # WINDOW MAIN LOOP
     while True:
-        event, values = window.read(timeout=10)
+        event, values_measure = window.read(timeout=10)
         currend_time = time.monotonic()
         
         if type_kinectics is True and currend_time - lap_time >= seconds_step:
@@ -210,7 +187,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             rest_flag = False
             
         if event == 'Pause':
-            event, values = window.read()
+            event, values_measure = window.read()
         if event == 'Quit' or None:
             answer = sg.PopupYesNo('Are you sure you want to quit?')
             if answer=='Yes':
@@ -245,12 +222,12 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
 
                 sample_list_photo, sample_list_diode = [], []
                 
-                if type_kinectics is False and nm_pos < nm_stop:
+                if type_kinectics is False and nm_pos <= nm_stop:
                     #move stepper, but don't want to overshoot
                     wave_step(nm_step, pin_list)
                     nm_pos += nm_step
 
-            if (type_kinectics is False and nm_pos >= nm_stop or
+            if (type_kinectics is False and nm_pos > nm_stop or
                 type_kinectics is True and currend_time - start_exp_time > reaction_time): 
                 #the experiment has ended
                 sg.PopupOK('End of the measures.\n REMEBER TO SAVE .CSV')
@@ -264,6 +241,9 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             # print(startADCTime - startTime)
             # print('\n\n')
             
+    '''----------------------------------------------------------------------
+            END OF MEASURES
+    ----------------------------------------------------------------------'''
     # Update buttons states
     window.Element('btn_csv').update(disabled=False)
     window.Element('btn_plot').update(disabled=False)
@@ -274,13 +254,43 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
     np_array_lamp = np.array(measurement_diode)     # for matplotlib
 
     while True:
-        event, values = window.read()
+        event, values_measure = window.read()
 
         if event == 'Quit' or None:
             break
 
         if event=='btn_csv':
-            _save(values, work_path)
+            '''Save procedure'''
+            save_csv_path = sg.PopupGetFile('Save experiment results as..',
+                                    save_as=True,
+                                    default_path=work_path,
+                                    file_types= (('save files', '.csv'),),)
+            try:
+                file = open((save_csv_path), 'w')
+                file.write('# Time stamp: ' + str(datetime.today())+ '\n')
+                file.write('# Blank subtraction file: '+ blank_file.name +'\n')
+                file.write('# Correction factor file: '+ correction_file.name +'\n#\n')
+                file.write('# Experiment type: '+ type_label +'\n')
+                if type_kinectics is False:
+                    file.write('# Start: '+ str(nm_start)+ ' nm, End: '+ str(nm_stop)+' nm\n')
+                    file.write('# Increment: '+ str(nm_step)+ ' nm,')
+                    file.write(' Integration Time: '+str(integration_time)+' seconds\n')
+                    file.write('#' + '_'*60+'\n')
+                    file.write('# Wavelenght (nm), measured value\n')
+                else:
+                    file.write('# Total reaction time: ' + str(reaction_time) + ' seconds,')
+                    file.write(' Step time: '+ str(seconds_step) +' seconds\n')
+                    file.write('# Excitation value: ' +str(nm_ex_fixed) + ' nm, ')
+                    file.write('Emition value: '+ str(nm_em_fixed)+ ' nm\n')
+                    file.write('#' + '_'*60+'\n')
+                    file.write('# Time (seconds), measured value\n')
+                    
+                for i in range (0, len(measurement_pos)):
+                    file.write(str(measurement_pos[i]) + ', ' + str(measurement_photo[i]) + '\n')
+                file.close()
+            except:
+                sg.PopupOK('Some error happened, wrong path, empty name or you canceled the save operation.\nNOT RECOMENDED.')
+                raise
         if event=='btn_plot':
             plt.plot(measurement_pos, measurement_photo) # figure with plot
             plt.xlabel('nm')

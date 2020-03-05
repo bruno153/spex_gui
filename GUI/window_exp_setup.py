@@ -6,7 +6,10 @@ from pathlib import Path
 sg.ChangeLookAndFeel('DarkBlue')
     
 
-def exp_setup(work_path):    
+def exp_setup(work_path):  
+    blank_file = Path('None')
+    correction_file = Path('None')
+  
     sg.SetOptions(text_justification='left')
     layout = [
         [sg.Text('Experiment', size=(20,1)), 
@@ -42,10 +45,10 @@ def exp_setup(work_path):
         [sg.Text('_'*60)],
         [sg.Button('Save setup...', key='save_setup'), 
             sg.Button('Open setup...', key='open_setup')], 
-        [sg.Button('Select blank subtraction file...', key='blank_file'), 
-            sg.Text('None', size=(40,1), key='blank_text')],
-        [sg.Button('Select correction file...', key='correction_file'), 
-            sg.Text('None', size=(40,1), key='correct_text')],
+        [sg.Button('Select blank subtraction file...', key='blank_file_btn'), 
+            sg.Text('None', size=(40,1), key='blank_file')],
+        [sg.Button('Select correction file...', key='correction_file_btn'), 
+            sg.Text('None', size=(40,1), key='correction_file')],
         [sg.Button('Submit', size=(20,1), button_color=('black','green')), 
             sg.Quit(size=(10,1), button_color=('black','red'))]
     ]
@@ -54,7 +57,8 @@ def exp_setup(work_path):
 
     while True:
         event, values = window.read()
-
+        values['blank_file'] = blank_file
+        values['correction_file'] = correction_file
         if event=='radio_em':
             window.Element('input_ex_en').Update(disabled=True)
             window.Element('input_em_en').Update(disabled=False)
@@ -83,6 +87,8 @@ def exp_setup(work_path):
             # manual_control()
         
         if event=='save_setup':
+            values['blank_file'] = blank_file
+            values['correction_file'] = correction_file
             try:
                 # save the experiment setup to the file
                 save_path = sg.PopupGetFile('Save experiment setup as..', 
@@ -143,24 +149,24 @@ def exp_setup(work_path):
             
             file.close()
         
-        if event=='blank_file':
-            blank_file=''
-            blank_file = sg.PopupGetFile('Select the blank subtraction file.')
-            window.Element('blank_text').Update(blank_file)
-            values['blank_file'] = blank_file
+        if event=='blank_file_btn':
+            blank_file = Path(sg.PopupGetFile('Select the blank subtraction file.',
+                                                initial_folder=str(work_path)))
+            window.Element('blank_file').Update(blank_file.name)
         
-        if event=='correction_file':
-            correction_file=''
-            correction_file = sg.PopupGetFile('Select the photomultiplier correction file.')
-            window.Element('correct_text').Update(correction_file)
-            values['correction_file'] = correction_file
+        if event=='correction_file_btn':
+            correction_file = Path(sg.PopupGetFile('Select the photomultiplier correction file.',
+                                                    initial_folder=str(work_path)))
+            window.Element('correction_file').Update(correction_file.name)
+
         
         if event in (None, 'Quit'):
             window.close()
             return None
         if event=='Submit':
-            values['correction_file'] = window.Element('correct_text')
-            values['blank_file'] = window.Element('blank_text')
+            values['blank_file'] = blank_file
+            values['correction_file'] = correction_file
+            print(values['correction_file'])
             break
     
     for i in values:
