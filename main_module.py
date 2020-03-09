@@ -23,7 +23,7 @@ pin_list_em['dirPin'] = io.DigitalOutputDevice(12)
 pin_list_em['stepInterval'] = .005 # milliseconds
 pin_list_em['stopPin1'] = io.DigitalInputDevice(7, pull_up=True) # positivo
 pin_list_em['stopPin2'] = io.DigitalInputDevice(1, pull_up=True) # negativo
-
+pin_list_em['enablePin'] = io.DigitalOutputDevice(5, active_high=False)
 # Pin setup
 pin_list_ex = {}
 
@@ -32,7 +32,7 @@ pin_list_ex['dirPin'] = io.DigitalOutputDevice(26)
 pin_list_ex['stepInterval'] = .005 # milliseconds
 pin_list_ex['stopPin1'] = io.DigitalInputDevice(20, pull_up=True) # positivo
 pin_list_ex['stopPin2'] = io.DigitalInputDevice(21, pull_up=True) # negativo
-
+pin_list_ex['enablePin'] = io.DigitalOutputDevice(13, active_high=False)
 # stopref1 = io.Device.pin_factory.pin(22)
 # stopref2 = io.Device.pin_factory.pin(23)
 
