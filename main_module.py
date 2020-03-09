@@ -2,8 +2,8 @@
 import PySimpleGUI as sg
 import pickle as p
 import gpiozero as io
-from gpiozero.pins.mock import MockFactory
-io.Device.pin_factory = MockFactory()
+# from gpiozero.pins.mock import MockFactory
+# io.Device.pin_factory = MockFactory()
 from time import sleep
 
 # import matplotlib.pyplot as plt
@@ -71,11 +71,3 @@ values = values_manual_control
 #get the measured values
 measure_pos, measure_results = measure(values, pin_list_ex, pin_list_em, work_path)
 sg.PopupOK('Thank you for using LightWay')
-# measure_pos = np.array(measure_pos)
-# measure_results = np.array(measure_results)
-
-# plt.plot(measure_pos, measure_results) # figure with plot
-# plt.xlabel('nm')
-# plt.ylabel('signal')
-# plt.title('Measurements Results')
-# plt.show()

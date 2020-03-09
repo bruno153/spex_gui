@@ -100,7 +100,6 @@ def exp_setup(work_path):
                 p.dump(values, open(save_path, 'wb'))
             except:
                 sg.PopupOK('Ou você não selecionou direito o caminho para salvar, ou algo deu errado.\n Sempre clique em browse para salvar.')
-                raise
                 
         if event=='open_setup':
             try:
@@ -142,15 +141,26 @@ def exp_setup(work_path):
                 sg.PopupOK('Erro de leitura, ou vc cancelou ou path inexistente ou bug inerente')
                 raise
         if event=='blank_file_btn':
-            blank_file = Path(sg.PopupGetFile('Select the blank subtraction file.',
-                                                initial_folder=str(work_path)))
-            window.Element('blank_file').Update(blank_file.name)
-        
-        if event=='correction_file_btn':
-            correction_file = Path(sg.PopupGetFile('Select the photomultiplier correction file.',
+            try:
+                blank_file = Path(sg.PopupGetFile('Select the blank subtraction file.',
                                                     initial_folder=str(work_path)))
-            window.Element('correction_file').Update(correction_file.name)
-
+                if blank_file == None:
+                    blank_file = Path('None')
+                window.Element('blank_file').Update(blank_file.name)
+            except:
+                blank_file = Path('None')
+                window.Element('blank_file').Update(blank_file.name)
+                pass
+        if event=='correction_file_btn':
+            try:
+                correction_file = Path(sg.PopupGetFile('Select the photomultiplier correction file.',
+                                                        initial_folder=str(work_path)))
+                if correction_file == None:
+                    correction_file = Path('None')
+                window.Element('correction_file').Update(correction_file.name)
+            except:
+                correction_file = Path('None')
+                window.Element('correction_file').Update(correction_file.name)
         
         if event in (None, 'Quit'):
             window.close()
