@@ -39,7 +39,8 @@ def _sample_measure(adc, SAMPLES=300):
     return mean_photo, mean_diode, elapsed_time
 
 def _timed_measure(adc, time_, SAMPLES=100):
-    '''return mean value of as many measures can be made in 'time_' seconds.'''
+    '''return mean value of as many measures can be made 
+    in at least 'time_' seconds.'''
     measure_photo = [None]*SAMPLES
     measure_diode = [None]*SAMPLES
     mean_photo = []
@@ -61,7 +62,7 @@ def _timed_measure(adc, time_, SAMPLES=100):
     return _mean_list(mean_photo), _mean_list(mean_diode)
 
 def measure(values, pin_list_ex, pin_list_em, work_path):
-    #varables from setup
+    #variables from setup
     if values['radio_ex']:
         type_label = 'excitation'
         nm_start = values['input_ex_st']
@@ -95,8 +96,11 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
     loading_popup = sg.Popup('Moving to start position. Please wait...',
                              non_blocking=True, auto_close=True, auto_close_duration=1)
     # moving the monocrom to start positions
-    wave_step(values['input_ex_st'] - values['nm_pos_ex'], pin_list_ex)
-    wave_step(values['input_em_st'] - values['nm_pos_em'], pin_list_em)
+    # we move a little behind to avoid hysteresis error
+    wave_step(values['input_ex_st'] - values['nm_pos_ex'] - 2, pin_list_ex)
+    wave_step(2, pin_list_ex)
+    wave_step(values['input_em_st'] - values['nm_pos_em'] - 2, pin_list_em)
+    wave_step(2, pin_list_em)
 
     nm_step = values['input_in_nm']             # step size between measures
     integration_time = values['integration_time']
@@ -254,7 +258,9 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
         event, values_measure = window.read()
 
         if event == 'Quit' or None:
-            break
+            yesno = sg.PopupYesNo('Are you sure you want to quit?\n ALL UNSAVED MEASURES WILL BE LOST FOREVER.')
+            if yesno == 'Yes':
+                break
 
         if event=='btn_csv':
             '''Save procedure'''

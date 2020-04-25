@@ -99,12 +99,16 @@ def manual_control(pin_list_ex, pin_list_em):
                     delta_val = temp_val - ex_val
                     ex_val = temp_val
                     window_manualControl['ex_val'].Update(ex_val/10)
-                    wave_step(delta_val/10, pin_list_ex)
+                    # we go a little behind (2nm) to avoid hysteresis
+                    wave_step(delta_val/10 - 2, pin_list_ex)
+                    wave_step(2, pin_list_ex)
                 else:
                     delta_val = temp_val - em_val
                     em_val = temp_val
                     window_manualControl['em_val'].Update(em_val/10)
-                    wave_step(delta_val/10, pin_list_em)
+                    # we go a little behind (2nm) to avoid hysteresis
+                    wave_step(delta_val/10 - 2, pin_list_em)
+                    wave_step(2, pin_list_em)
             except:
                 sg.PopupOK('Escreva um número (use ponto para o decimal)', title='Erro')
             window_manualControl['set_goto_val'].Update('')

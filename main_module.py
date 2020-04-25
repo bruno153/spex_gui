@@ -15,18 +15,17 @@ from GUI.window_login import login
 from GUI.window_manual_control import manual_control
 from GUI.window_splash import splash
 
-# Pin setup
+# Pin setup emition
 pin_list_em = {}
-
 pin_list_em['stepPin'] = io.DigitalOutputDevice(16)
 pin_list_em['dirPin'] = io.DigitalOutputDevice(12)
 pin_list_em['stepInterval'] = .005 # milliseconds
 pin_list_em['stopPin1'] = io.DigitalInputDevice(7, pull_up=True) # positivo
 pin_list_em['stopPin2'] = io.DigitalInputDevice(1, pull_up=True) # negativo
 pin_list_em['enablePin'] = io.DigitalOutputDevice(5, active_high=False)
-# Pin setup
-pin_list_ex = {}
 
+# Pin setup excitation
+pin_list_ex = {}
 pin_list_ex['stepPin'] = io.DigitalOutputDevice(19)
 pin_list_ex['dirPin'] = io.DigitalOutputDevice(26)
 pin_list_ex['stepInterval'] = .005 # milliseconds
