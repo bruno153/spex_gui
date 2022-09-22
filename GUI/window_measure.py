@@ -4,8 +4,8 @@ from math import floor
 from datetime import datetime
 from random import randint
 
-from mcp3208 import MCP3208
-'''we defaut the photomultiplier reads on chanel 0 and the photodiode reads 
+from Hardware.mcp3208.MCP3208 import MCP3208
+'''we defaut the photomultiplier reads on chanel 0 and the photodiode reads
 on channel 1'''
 
 from Hardware.StepControler import wave_step
@@ -30,7 +30,7 @@ def _sample_measure(adc, SAMPLES=300):
         measure_diode[i] = adc.read(1)
         # measure_photo[i] = randint(0, 4100)
         # measure_diode[i] = randint(0, 4100)#------------------Change to test on pc ------------
-        
+
     currend = time.monotonic()
     mean_photo = _mean_list(measure_photo)
     mean_diode = _mean_list(measure_diode)
@@ -39,7 +39,7 @@ def _sample_measure(adc, SAMPLES=300):
     return mean_photo, mean_diode, elapsed_time
 
 def _timed_measure(adc, time_, SAMPLES=100):
-    '''return mean value of as many measures can be made 
+    '''return mean value of as many measures can be made
     in at least 'time_' seconds.'''
     measure_photo = [None]*SAMPLES
     measure_diode = [None]*SAMPLES
@@ -90,7 +90,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
         nm_em_fixed = values['input_em_st']
         reaction_time = values['input_ti']  # total experiment time
         seconds_step = values['input_in_s'] # rest time between measures
-        
+
 
     #Going to initial position popup
     loading_popup = sg.Popup('Moving to start position. Please wait...',
@@ -125,7 +125,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
     # Data collection setup
     #RATE = samples_per_second
 
-    
+
     # Create the ADC object
     adc = MCP3208()
     # adc = []              #------------------Change to test on pc ------------
@@ -146,7 +146,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             sg.Text('', justification='right', size=(8,1), key='last_measure')],
         [sg.Text('Sample number: '),
             sg.Text(str(len(sample_list_photo)), size=(2, 1), key='text_sample')],
-        [sg.Graph(canvas_size=(600, 300), 
+        [sg.Graph(canvas_size=(600, 300),
                   graph_bottom_left=(graph_label_start - 5,-30), # compensate for borders
                   graph_top_right=(graph_label_stop + 5,4060),  # compensate for borders
                   background_color='white', key='graph')],
@@ -170,23 +170,23 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
 
     # Ready to start experiment
     sg.PopupOK('Press \'OK\' to start.', title='Ready to go', non_blocking=False)
-    
+
     # used for kinectics experiment
     rest_flag = False
-    start_exp_time = time.monotonic()        
-    currend_integration_time = 0           
+    start_exp_time = time.monotonic()
+    currend_integration_time = 0
     lap_time = start_exp_time
-    
+
     time_spent_on_adc = 0.1
     # WINDOW MAIN LOOP
     while True:
         event, values_measure = window.read(timeout=10)
         currend_time = time.monotonic()
-        
+
         if type_kinectics is True and currend_time - lap_time >= seconds_step:
             '''Rest time is over, we need to start the ADC reads.'''
             rest_flag = False
-            
+
         if event == 'Pause':
             event, values_measure = window.read()
         if event == 'Quit' or None:
@@ -200,7 +200,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             sample_list_diode.append(None)
             sample_list_photo[-1], sample_list_diode[-1] = _timed_measure(adc, time_spent_on_adc)
             currend_integration_time += time_spent_on_adc
-            
+
             if currend_integration_time >= integration_time:
                 '''integrated the right amount of time.'''
                 rest_flag = True
@@ -214,26 +214,26 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
                 else:
                     measurement_pos.append(currend_time - start_exp_time)
                     lap_time = time.monotonic()
-                
+
                 #draw a line between the last two measurements
                 #if there's at least two elements in the measurement
                 if len(measurement_pos) > 1:
-                    graph.DrawLine((measurement_pos[-1], measurement_photo[-1]), 
+                    graph.DrawLine((measurement_pos[-1], measurement_photo[-1]),
                                    (measurement_pos[-2], measurement_photo[-2]))
 
                 sample_list_photo, sample_list_diode = [], []
-                
+
                 if type_kinectics is False and nm_pos <= nm_stop:
                     #move stepper, but don't want to overshoot
                     wave_step(nm_step, pin_list)
                     nm_pos += nm_step
 
             if (type_kinectics is False and nm_pos > nm_stop or
-                type_kinectics is True and currend_time - start_exp_time > reaction_time): 
+                type_kinectics is True and currend_time - start_exp_time > reaction_time):
                 #the experiment has ended
                 sg.PopupOK('End of the measures.\n REMEBER TO SAVE .CSV')
                 break
-            
+
             #update window
             window.Element('text.nm').update(str(nm_pos))
             window.Element('text_sample').update(str(len(sample_list_photo)))
@@ -241,7 +241,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
             # print(startTime - stopTime)
             # print(startADCTime - startTime)
             # print('\n\n')
-            
+
     '''----------------------------------------------------------------------
             END OF MEASURES
     ----------------------------------------------------------------------'''
@@ -287,7 +287,7 @@ def measure(values, pin_list_ex, pin_list_em, work_path):
                     file.write('Emition value: '+ str(nm_em_fixed)+ ' nm\n')
                     file.write('#' + '_'*60+'\n')
                     file.write('# Time (seconds), measured value\n')
-                    
+
                 for i in range (0, len(measurement_pos)):
                     file.write(str(measurement_pos[i]) + ', ' + str(measurement_photo[i]) + '\n')
                 file.close()
