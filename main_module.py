@@ -2,8 +2,8 @@
 import PySimpleGUI as sg
 import pickle as p
 import gpiozero as io
-from gpiozero.pins.mock import MockFactory
-io.Device.pin_factory = MockFactory()
+#from gpiozero.pins.mock import MockFactory
+#io.Device.pin_factory = MockFactory()
 from time import sleep
 
 # import matplotlib.pyplot as plt
