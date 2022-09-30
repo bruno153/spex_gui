@@ -384,7 +384,7 @@
    (to (symbol 1a05fe4a-0054-4df1-adb4-693d49d1f694) (pin 8c4b3571-bd80-495c-a69c-f07bfde720db))
   )
   (label 51f28ba7-d015-43c0-8349-e2251766cab2
-   (position -27.94 -40.64) (rotation 0.0)
+   (position -30.48 -40.64) (rotation 0.0)
   )
  )
  (netsegment 200c8df4-1a96-469b-bc50-62f3c77a5722
@@ -942,7 +942,7 @@
    (to (junction 53b916c8-e7ee-48d6-bfd7-719b2622f27b))
   )
   (label 93a83ed9-8486-4cd9-a287-4e1052eae9bf
-   (position -25.4 -93.98) (rotation 0.0)
+   (position -27.94 -93.98) (rotation 0.0)
   )
  )
  (netsegment a745537b-acf4-4195-91f5-1ecc90e219c1
